@@ -41,7 +41,7 @@ export default function ClientHome({
             />
 
             {/* Content Sections */}
-            <div className="relative z-10 space-y-8 -mt-20">
+            <div className="relative z-10 space-y-8 mt-0 md:-mt-20">
                 {/* AI Recommendations - Featured First */}
                 <AIRecommendations onPlay={handlePlay} />
 

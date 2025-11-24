@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
-import { X, Film, Calendar } from 'react-feather';
+import { X, Film, Calendar, User, Mail } from 'react-feather';
 
 interface RequestMovieModalProps {
     isOpen: boolean;
@@ -21,6 +21,8 @@ export default function RequestMovieModal({
     const [formData, setFormData] = useState({
         title: '',
         releaseYear: '',
+        name: '',
+        email: '',
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -39,7 +41,7 @@ export default function RequestMovieModal({
                 setSuccess(true);
                 setTimeout(() => {
                     setSuccess(false);
-                    setFormData({ title: '', releaseYear: '' });
+                    setFormData({ title: '', releaseYear: '', name: '', email: '' });
                     onClose();
                 }, 2000);
             } else {
@@ -115,6 +117,50 @@ export default function RequestMovieModal({
                                                     }
                                                     className="w-full bg-black/30 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/50 transition-all"
                                                     placeholder="e.g. Inception"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+                                                Your Name
+                                            </label>
+                                            <div className="relative group">
+                                                <User
+                                                    size={18}
+                                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-brand-purple transition-colors"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={formData.name}
+                                                    onChange={(e) =>
+                                                        setFormData({ ...formData, name: e.target.value })
+                                                    }
+                                                    className="w-full bg-black/30 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/50 transition-all"
+                                                    placeholder="Your Name"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+                                                Your Email
+                                            </label>
+                                            <div className="relative group">
+                                                <Mail
+                                                    size={18}
+                                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-brand-purple transition-colors"
+                                                />
+                                                <input
+                                                    type="email"
+                                                    value={formData.email}
+                                                    onChange={(e) =>
+                                                        setFormData({ ...formData, email: e.target.value })
+                                                    }
+                                                    className="w-full bg-black/30 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/50 transition-all"
+                                                    placeholder="your@email.com"
                                                     required
                                                 />
                                             </div>

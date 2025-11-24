@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     try {
         await dbConnect();
         const session = await getServerSession(authOptions);
-        const { title, releaseYear } = await req.json();
+        const { title, releaseYear, name, email } = await req.json();
 
         if (!title) {
             return NextResponse.json(
@@ -38,10 +38,14 @@ export async function POST(req: Request) {
             );
         }
 
+        const userName = name || session?.user?.name || 'Anonymous';
+        const userEmail = email || session?.user?.email || 'No Email Provided';
+
         const request = await MovieRequest.create({
             movieTitle: title,
             releaseYear,
-            userName: session?.user?.name || 'Anonymous',
+            userName,
+            userEmail,
             status: 'pending',
         });
 

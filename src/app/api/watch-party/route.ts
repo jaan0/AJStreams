@@ -229,11 +229,16 @@ export async function PUT(req: NextRequest) {
                     party.participants.push(userId);
 
                     // Trigger update event for participants list
-                    await pusherServer.trigger(`private-watch-party-${party._id}`, 'party-update', {
-                        type: 'join',
-                        userId,
-                        participants: party.participants
-                    });
+                    try {
+                        await pusherServer.trigger(`private-watch-party-${party._id}`, 'party-update', {
+                            type: 'join',
+                            userId,
+                            participants: party.participants
+                        });
+                    } catch (pusherError) {
+                        console.error('Pusher trigger failed:', pusherError);
+                        // Continue execution even if Pusher fails
+                    }
                 }
                 break;
 

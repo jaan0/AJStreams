@@ -4,7 +4,8 @@ export interface IMovieRequest extends Document {
     movieTitle: string;
     releaseYear?: number;
     status: 'pending' | 'fulfilled' | 'rejected';
-    userName: string; // Or userId if you want to link to User model
+    userName: string;
+    userEmail: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -19,6 +20,7 @@ const MovieRequestSchema: Schema<IMovieRequest> = new Schema(
             default: 'pending',
         },
         userName: { type: String, required: true },
+        userEmail: { type: String, required: true },
     },
     { timestamps: true }
 );
