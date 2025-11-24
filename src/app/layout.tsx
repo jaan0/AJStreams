@@ -10,6 +10,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
     title: 'MyFlix - Stream Your Favorites',
     description: 'The best place to watch movies and TV shows.',
+    icons: {
+        icon: '/logo.png',
+    },
 };
 
 export default function RootLayout({
