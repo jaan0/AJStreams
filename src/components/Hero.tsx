@@ -77,7 +77,7 @@ export default function Hero({ movies, onPlay, onMoreInfo }: HeroProps) {
                                 </span>
                             ))}
                         </div>
-                        <h1 className="text-5xl md:text-6xl font-black drop-shadow-2xl tracking-tight leading-tight">
+                        <h1 className="text-3xl md:text-6xl font-black drop-shadow-2xl tracking-tight leading-tight">
                             {currentMovie.title}
                         </h1>
                         <div className="flex items-center gap-4 text-zinc-300 text-sm font-medium">
@@ -132,9 +132,8 @@ export default function Hero({ movies, onPlay, onMoreInfo }: HeroProps) {
                         <button
                             key={index}
                             onClick={() => setCurrentIndex(index)}
-                            className={`w-2 h-2 rounded-full transition-colors ${
-                                currentIndex === index ? 'bg-white' : 'bg-white/50'
-                            }`}
+                            className={`w-2 h-2 rounded-full transition-colors ${currentIndex === index ? 'bg-white' : 'bg-white/50'
+                                }`}
                         />
                     ))}
                 </div>
