@@ -242,6 +242,30 @@ export default function VideoPlayer({
             }
         };
     }, []);
+    useEffect(() => {
+        // Auto-rotate to landscape on mobile
+        const lockOrientation = async () => {
+            if (screen.orientation && (screen.orientation as any).lock) {
+                try {
+                    await (screen.orientation as any).lock('landscape');
+                } catch (e) {
+                    console.log('Orientation lock not supported or failed', e);
+                }
+            }
+        };
+
+        lockOrientation();
+
+        return () => {
+            if (screen.orientation && (screen.orientation as any).unlock) {
+                try {
+                    (screen.orientation as any).unlock();
+                } catch (e) {
+                    console.log('Orientation unlock failed', e);
+                }
+            }
+        };
+    }, []);
 
     return (
         <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">

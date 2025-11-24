@@ -45,8 +45,16 @@ export default function MoviePage() {
 
     useEffect(() => {
         if (partyId && session?.user) {
-            const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-                cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+            const pusherKey = process.env.NEXT_PUBLIC_PUSHER_KEY;
+            const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
+
+            if (!pusherKey) {
+                console.error('Pusher key is missing. Please check NEXT_PUBLIC_PUSHER_KEY in .env.local');
+                return;
+            }
+
+            const pusher = new Pusher(pusherKey, {
+                cluster: pusherCluster || 'mt1',
                 authEndpoint: '/api/pusher/auth',
             });
 

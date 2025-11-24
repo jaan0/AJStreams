@@ -71,7 +71,7 @@ export default function Hero({ movies, onPlay, onMoreInfo }: HeroProps) {
                             {currentMovie.genre.slice(0, 3).map((g, i) => (
                                 <span
                                     key={i}
-                                    className="px-3 py-1.5 rounded-full glass border border-white/20 text-xs font-bold uppercase tracking-wider"
+                                    className="px-2 py-1 md:px-3 md:py-1.5 rounded-full glass border border-white/20 text-[10px] md:text-xs font-bold uppercase tracking-wider"
                                 >
                                     {g}
                                 </span>
@@ -106,15 +106,15 @@ export default function Hero({ movies, onPlay, onMoreInfo }: HeroProps) {
                         </div>
                     </motion.div>
 
-                    {/* Right Side: Poster */}
+                    {/* Right Side: Poster (Visible on mobile now) */}
                     <motion.div
                         key={currentIndex + '-poster'}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.8, ease: 'easeOut' }}
-                        className="hidden md:flex justify-center items-center"
+                        className="flex justify-center items-center mt-8 md:mt-0 order-first md:order-last"
                     >
-                        <div className="relative w-[300px] aspect-[2/3] rounded-lg overflow-hidden shadow-2xl">
+                        <div className="relative w-[200px] md:w-[300px] aspect-[2/3] rounded-lg overflow-hidden shadow-2xl">
                             <img
                                 src={currentMovie.posterUrl}
                                 alt={currentMovie.title}
