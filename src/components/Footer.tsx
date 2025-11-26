@@ -41,10 +41,23 @@ export default function Footer() {
     ];
 
     return (
-        <footer className="bg-black border-t border-white/10 mt-20">
-            <div className="max-w-7xl mx-auto px-4 md:px-12 py-12">
+        <footer className="bg-black border-t border-white/5 mt-20">
+            <div className="max-w-7xl mx-auto px-4 md:px-12 py-12 space-y-12">
+                {/* CTA band */}
+                <div className="neo-glass rounded-2xl p-6 md:p-10 border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div className="space-y-2">
+                        <div className="pill bg-white/15 border-white/15">Built for streaming teams</div>
+                        <h2 className="text-2xl md:text-3xl font-bold">Launch a cinematic experience in minutes.</h2>
+                        <p className="text-zinc-300 max-w-2xl">Curated discovery, crystal clear playback, and collaborative watch parties packaged like your favorite SaaS.</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Link href="/" className="btn-primary">Start Watching</Link>
+                        <Link href="/watch-parties" className="btn-secondary">Host a Party</Link>
+                    </div>
+                </div>
+
                 {/* Main Footer Content */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     {/* Company */}
                     <div>
                         <h3 className="text-white font-bold mb-4 text-sm uppercase tracking-wider">
@@ -123,7 +136,7 @@ export default function Footer() {
                 </div>
 
                 {/* Social Media Icons */}
-                <div className="flex items-center justify-center gap-4 mb-8 pb-8 border-b border-white/10">
+                <div className="flex items-center justify-center gap-4 pb-6 border-b border-white/10">
                     {socialLinks.map((social) => {
                         const Icon = social.icon;
                         return (

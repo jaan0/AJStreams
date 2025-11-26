@@ -29,16 +29,17 @@ export default function Navbar() {
             <motion.nav
                 className="fixed top-0 left-0 right-0 z-50 h-16 md:h-20 flex items-center"
                 initial={{
-                    backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.7), transparent)',
-                    backgroundColor: 'rgba(10, 10, 10, 0)',
+                    backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)',
+                    backgroundColor: 'rgba(5, 5, 5, 0)',
                 } as any}
                 animate={{
-                    backgroundImage: isScrolled ? 'none' : 'linear-gradient(to bottom, rgba(0,0,0,0.7), transparent)',
-                    backgroundColor: isScrolled ? 'rgba(10, 10, 10, 0.8)' : 'rgba(10, 10, 10, 0)',
-                    backdropFilter: isScrolled ? 'blur(16px)' : 'blur(0px)',
-                    borderBottom: isScrolled ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0)',
+                    backgroundImage: isScrolled ? 'none' : 'linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)',
+                    backgroundColor: isScrolled ? 'rgba(10, 10, 10, 0.8)' : 'rgba(5, 5, 5, 0)',
+                    backdropFilter: isScrolled ? 'blur(18px)' : 'blur(0px)',
+                    borderBottom: isScrolled ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(255, 255, 255, 0)',
+                    boxShadow: isScrolled ? '0 20px 60px rgba(0,0,0,0.45)' : 'none',
                 } as any}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
             >
                 <div className="w-full px-4 md:px-12 flex items-center justify-between">
                     {/* Left Section */}
@@ -53,19 +54,26 @@ export default function Navbar() {
 
                         <Link
                             href="/"
-                            className="hover:opacity-80 transition-opacity"
+                            className="hover:opacity-80 transition-opacity flex items-center gap-3"
                         >
-                            <img src="/logo.png" alt="Logo" className="h-10 md:h-14" />
+                            <div className="relative">
+                                <div className="absolute inset-0 blur-xl bg-gradient-brand opacity-70 animate-pulse" />
+                                <img src="/logo.png" alt="Logo" className="relative h-10 md:h-14" />
+                            </div>
+                            <div className="hidden md:flex flex-col leading-tight">
+                                <span className="text-xs uppercase tracking-[0.3em] text-zinc-400">StreamOS</span>
+                                <span className="text-lg font-bold text-white">Cinematic SaaS</span>
+                            </div>
                         </Link>
 
                         {/* Desktop Navigation Links */}
-                        <div className="hidden md:flex gap-6 text-sm font-medium text-zinc-300">
-                            <Link href="/" className="hover:text-white transition-colors">Home</Link>
-                            <Link href="/movies" className="hover:text-white transition-colors">Movies</Link>
+                        <div className="hidden md:flex gap-3 text-sm font-medium text-zinc-300 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 shadow-glow">
+                            <Link href="/" className="px-3 py-1 rounded-full hover:bg-white/10 hover:text-white transition-colors">Home</Link>
+                            <Link href="/movies" className="px-3 py-1 rounded-full hover:bg-white/10 hover:text-white transition-colors">Movies</Link>
                             {session && (
                                 <>
-                                    <Link href="/my-list" className="hover:text-white transition-colors">My List</Link>
-                                    <Link href="/watch-parties" className="hover:text-white transition-colors">Watch Parties</Link>
+                                    <Link href="/my-list" className="px-3 py-1 rounded-full hover:bg-white/10 hover:text-white transition-colors">My List</Link>
+                                    <Link href="/watch-parties" className="px-3 py-1 rounded-full hover:bg-white/10 hover:text-white transition-colors">Watch Parties</Link>
                                 </>
                             )}
                         </div>
@@ -73,6 +81,11 @@ export default function Navbar() {
 
                     {/* Right Section */}
                     <div className="flex items-center gap-2 md:gap-4">
+                        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 shadow-lg">
+                            <div className="pill">New</div>
+                            <span className="text-xs text-zinc-300">Ultra-fast CDN delivery</span>
+                        </div>
+
                         <button
                             onClick={() => setShowSearchModal(true)}
                             className="text-zinc-300 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
@@ -136,6 +149,10 @@ export default function Navbar() {
                                 </AnimatePresence>
                             </div>
                         ) : (
+                            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-brand text-white text-xs font-semibold shadow-glow">
+                                <span className="bg-black/30 px-2 py-0.5 rounded-full">Beta</span>
+                                <span>Smarter curation, monthly updates</span>
+                            </div>
                             <button onClick={() => setShowAuthModal(true)} className="btn-primary text-xs md:text-sm px-4 py-2 md:px-6 md:py-2">
                                 Sign In
                             </button>

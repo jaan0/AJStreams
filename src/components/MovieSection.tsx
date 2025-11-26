@@ -41,16 +41,24 @@ export default function MovieSection({
     };
 
     return (
-        <div className="space-y-4 py-6">
-            <h2 className="text-xl md:text-2xl font-bold text-white px-4 md:px-12 flex items-center gap-3">
-                <span className="w-1 h-6 bg-gradient-brand rounded-full"></span>
-                {title}
-            </h2>
+        <div className="space-y-4 py-10 px-2 md:px-6">
+            <div className="flex items-center justify-between px-2 md:px-6">
+                <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
+                    <span className="w-10 h-1 rounded-full bg-gradient-brand"></span>
+                    <span>{title}</span>
+                </h2>
+                <div className="hidden md:flex items-center gap-2 text-xs text-zinc-400">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    Ultra crisp previews
+                </div>
+            </div>
 
-            <div className="relative group px-4 md:px-12">
+            <div className="relative group px-2 md:px-6">
+                <div className="absolute inset-4 rounded-3xl bg-gradient-to-r from-white/5 via-white/0 to-white/5 blur-3xl pointer-events-none" />
+                <div className="absolute inset-0 rounded-3xl border border-white/5" />
                 <button
                     onClick={() => scroll('left')}
-                    className="absolute left-2 md:left-8 top-0 bottom-0 z-40 w-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    className="absolute left-0 md:left-4 top-0 bottom-0 z-40 w-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     aria-label="Scroll left"
                 >
                     <div className="bg-black/70 backdrop-blur-sm rounded-full p-2.5 hover:bg-black/90 hover:scale-110 transition-all border border-white/20 shadow-lg">
@@ -64,7 +72,7 @@ export default function MovieSection({
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, amount: 0.1 }}
-                    className="flex gap-4 overflow-x-auto scrollbar-hide pb-8 pt-2 snap-x"
+                    className="flex gap-4 overflow-x-auto scrollbar-hide pb-8 pt-6 snap-x"
                 >
                     {movies.map((movie) => (
                         <MovieCard
@@ -77,7 +85,7 @@ export default function MovieSection({
 
                 <button
                     onClick={() => scroll('right')}
-                    className="absolute right-2 md:right-8 top-0 bottom-0 z-40 w-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    className="absolute right-0 md:right-4 top-0 bottom-0 z-40 w-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     aria-label="Scroll right"
                 >
                     <div className="bg-black/70 backdrop-blur-sm rounded-full p-2.5 hover:bg-black/90 hover:scale-110 transition-all border border-white/20 shadow-lg">
