@@ -1,9 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
-    swcMinify: false, // Disable SWC minification if SWC binary fails to load on Windows
+    swcMinify: false,
     images: {
-        domains: ['res.cloudinary.com', 'image.tmdb.org', 'via.placeholder.com'],
+        remotePatterns: [
+            { protocol: 'https', hostname: 'res.cloudinary.com' },
+            { protocol: 'https', hostname: 'image.tmdb.org' },
+            { protocol: 'https', hostname: 'via.placeholder.com' },
+            { protocol: 'https', hostname: 'images.unsplash.com' },
+        ],
     },
 };
 

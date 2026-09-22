@@ -393,9 +393,10 @@ export default function VideoPlayer({
                         ref={iframeRef}
                         src={embedInfo.embedUrl}
                         title={title}
-                        className="w-full h-full object-contain border-0"
-                        allow="autoplay; fullscreen; picture-in-picture"
+                        className="w-full h-full border-0"
+                        allow="autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope"
                         allowFullScreen
+                        referrerPolicy="origin"
                     />
                 ) : (
                     <video
@@ -414,43 +415,47 @@ export default function VideoPlayer({
                 {embedInfo.isBingr && (
                     <div className="absolute top-4 left-4 z-40 bg-purple-900/80 backdrop-blur-md px-3 py-1 rounded-full border border-purple-500/30 text-xs font-semibold text-purple-200 pointer-events-none flex items-center gap-1.5 shadow-lg">
                         <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
-                        Bingr Player Enabled
+                        Bingr Player
                     </div>
                 )}
 
-                {/* Buffering Indicator */}
+                {/* Buffering Indicator (native video only) */}
                 {buffering && !embedInfo.isIframe && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
                         <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin" />
                     </div>
                 )}
 
                 {/* Sync Indicator */}
                 {isSyncing && (
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-brand-purple/90 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-medium z-40">
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-brand-purple/90 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-medium z-40 pointer-events-none">
                         Syncing...
                     </div>
                 )}
 
                 {/* Non-Host Message */}
                 {partyId && !isHost && (
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm z-40">
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm z-40 pointer-events-none">
                         Host is controlling playback
                     </div>
                 )}
 
-                {/* Remote Control Overlay (Optional / Toggleable) */}
-                <div
-                    className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/50 transition-opacity duration-300 pointer-events-none ${showControls ? 'opacity-100' : 'opacity-0'
-                        }`}
-                >
-                    {/* Top Bar - Title */}
-                    <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between pointer-events-auto">
-                        <h2 className="text-white text-xl font-bold drop-shadow-md ml-14">{title}</h2>
-                    </div>
+                {/* Top Title Bar (Floating) */}
+                <div className="absolute top-0 left-0 right-0 p-4 pointer-events-none z-30 flex items-center justify-between">
+                    <h2 className="text-white text-lg md:text-xl font-bold drop-shadow-md ml-14 truncate max-w-md">
+                        {title}
+                    </h2>
+                </div>
 
-                    {/* Bottom Controls Bar */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 space-y-2 pointer-events-auto">
+                {/* Native Video Controls Overlay (Only for native direct videos, not iframes) */}
+                {!embedInfo.isIframe && (
+                    <div
+                        className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/50 transition-opacity duration-300 pointer-events-none ${
+                            showControls ? 'opacity-100' : 'opacity-0'
+                        }`}
+                    >
+                        {/* Bottom Controls Bar */}
+                        <div className="absolute bottom-0 left-0 right-0 p-4 space-y-2 pointer-events-auto">
                         {/* Progress Bar (if duration is available) */}
                         {duration > 0 && (
                             <div className="flex items-center gap-3">
@@ -545,7 +550,8 @@ export default function VideoPlayer({
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
+    </div>
     );
 }
