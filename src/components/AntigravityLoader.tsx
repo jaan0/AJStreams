@@ -24,8 +24,8 @@ const AJStreamsLoader = () => {
         <div className="fixed inset-0 bg-gradient-to-br from-black via-zinc-900 to-black flex items-center justify-center z-50">
             {/* Animated Background */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-purple/10 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-pink/10 rounded-full blur-3xl animate-pulse delay-1000" />
+                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-accent/10 rounded-full blur-3xl animate-pulse" />
+                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-secondary/10 rounded-full blur-3xl animate-pulse delay-1000" />
             </div>
 
             {/* Loader Content */}
@@ -70,7 +70,7 @@ const AJStreamsLoader = () => {
                     {[...Array(20)].map((_, i) => (
                         <div
                             key={i}
-                            className="absolute w-1 h-1 bg-brand-purple/30 rounded-full animate-float"
+                            className="absolute w-1 h-1 bg-brand-accent/30 rounded-full animate-float"
                             style={{
                                 left: `${Math.random() * 100}%`,
                                 top: `${Math.random() * 100}%`,

@@ -59,6 +59,13 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         router.push(`/movie/${movie._id}`);
     };
 
+    useEffect(() => {
+        if (!isOpen) return;
+        const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); };
+        document.addEventListener('keydown', closeOnEscape);
+        return () => document.removeEventListener('keydown', closeOnEscape);
+    }, [isOpen, onClose]);
+
     // Filter results based on selected filter
     const filteredResults = results.filter(movie => {
         if (filterType === 'all') return true;
@@ -88,10 +95,10 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                         exit={{ opacity: 0, y: -20, scale: 0.98 }}
                         className="fixed top-12 left-0 right-0 z-[110] p-4 flex justify-center"
                     >
-                        <div className="w-full max-w-3xl bg-[#121216] border border-white/10 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col ring-1 ring-purple-500/20">
+                        <div role="dialog" aria-modal="true" aria-label="Search library" className="w-full max-w-3xl max-h-[85dvh] bg-[#121216] border border-white/10 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col ring-1 ring-slate-500/20">
                             {/* Search Input Box */}
                             <div className="flex items-center px-4 py-3.5 border-b border-white/10 bg-black/40">
-                                <Search className="text-purple-400 mr-3 flex-shrink-0" size={20} />
+                                <Search className="text-slate-400 mr-3 flex-shrink-0" size={20} />
                                 <input
                                     ref={inputRef}
                                     type="text"
@@ -110,7 +117,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                 )}
                                 <button
                                     onClick={onClose}
-                                    className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+                                    aria-label="Close search" className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
                                 >
                                     <X size={18} />
                                 </button>
@@ -131,7 +138,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                             onClick={() => setFilterType(tab.id)}
                                             className={`flex items-center gap-1.5 px-3 py-1 rounded-lg font-bold transition-all ${
                                                 filterType === tab.id
-                                                    ? 'bg-purple-600 text-white shadow-sm shadow-purple-600/30'
+                                                    ? 'bg-slate-600 text-white shadow-sm shadow-slate-600/30'
                                                     : 'bg-white/5 text-zinc-400 hover:text-white'
                                             }`}
                                         >
@@ -160,7 +167,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                             <div
                                                 key={(movie._id as unknown) as string}
                                                 onClick={() => handlePlayMovie(movie)}
-                                                className="flex items-center gap-3.5 p-2.5 rounded-xl bg-zinc-900/40 hover:bg-purple-950/30 border border-white/5 hover:border-purple-500/40 transition-all group cursor-pointer"
+                                                className="flex items-center gap-3.5 p-2.5 rounded-xl bg-zinc-900/40 hover:bg-slate-950/30 border border-white/5 hover:border-slate-500/40 transition-all group cursor-pointer"
                                             >
                                                 {/* Poster */}
                                                 <div className="relative w-14 h-20 rounded-lg overflow-hidden bg-black/60 flex-shrink-0">
@@ -174,13 +181,13 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                                 {/* Info */}
                                                 <div className="flex-1 min-w-0 space-y-1">
                                                     <div className="flex items-center gap-2">
-                                                        <h4 className="font-bold text-white text-sm group-hover:text-purple-300 transition-colors truncate">
+                                                        <h4 className="font-bold text-white text-sm group-hover:text-slate-300 transition-colors truncate">
                                                             {movie.title}
                                                         </h4>
                                                         <span
                                                             className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
                                                                 isSeries
-                                                                    ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                                                                    ? 'bg-slate-500/20 text-slate-300 border border-slate-500/30'
                                                                     : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
                                                             }`}
                                                         >
@@ -206,7 +213,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                                             e.stopPropagation();
                                                             handlePlayMovie(movie);
                                                         }}
-                                                        className="flex items-center gap-1.5 px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition-all shadow-md group-hover:scale-105"
+                                                        className="flex items-center gap-1.5 px-3 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-xl text-xs font-bold transition-all shadow-md group-hover:scale-105"
                                                     >
                                                         <Play size={12} fill="white" />
                                                         <span>Play</span>

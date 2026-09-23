@@ -30,7 +30,7 @@ export default function AdminDashboardClient() {
                     {activeTab === 'movies' && (
                         <motion.div
                             layoutId="activeAdminTab"
-                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-500"
+                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-500"
                         />
                     )}
                 </button>
@@ -48,7 +48,7 @@ export default function AdminDashboardClient() {
                     {activeTab === 'requests' && (
                         <motion.div
                             layoutId="activeAdminTab"
-                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-500"
+                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-500"
                         />
                     )}
                 </button>

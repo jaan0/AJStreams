@@ -228,10 +228,10 @@ export default function MoviePage() {
                 {isTvShow && (
                     <button
                         onClick={() => setIsEpisodeSidebarOpen(!isEpisodeSidebarOpen)}
-                        className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex items-center gap-2 bg-gradient-to-l from-purple-700 to-purple-600 hover:from-purple-600 hover:to-purple-500 text-white pl-3.5 pr-2.5 py-3 rounded-l-2xl shadow-[0_0_30px_rgba(168,85,247,0.5)] border-y border-l border-white/20 transition-all hover:pl-4 group"
+                        className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex items-center gap-2 bg-gradient-to-l from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white pl-3.5 pr-2.5 py-3 rounded-l-2xl shadow-[0_0_30px_rgba(168,85,247,0.5)] border-y border-l border-white/20 transition-all hover:pl-4 group"
                         title="Open Episodes list"
                     >
-                        <Layers size={16} className="text-purple-200 group-hover:scale-110 transition-transform" />
+                        <Layers size={16} className="text-slate-200 group-hover:scale-110 transition-transform" />
                         <span className="text-xs font-bold tracking-wider uppercase">Episodes</span>
                     </button>
                 )}

@@ -276,7 +276,7 @@ export default function WatchPartyChat({
         return (
             <button
                 onClick={onToggleMinimize}
-                className="absolute top-4 right-4 w-12 h-12 bg-black/80 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-brand-purple transition-colors z-50 shadow-lg border border-white/10"
+                className="absolute top-4 right-4 w-12 h-12 bg-black/80 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-brand-accent transition-colors z-50 shadow-lg border border-white/10"
                 title="Open Chat"
             >
                 <MessageCircle size={24} />
@@ -297,7 +297,7 @@ export default function WatchPartyChat({
                         <div className="relative">
                             <button
                                 onClick={() => setShowShareModal(!showShareModal)}
-                                className={`p-2 rounded-lg transition-colors ${showShareModal ? 'bg-brand-purple text-white' : 'hover:bg-white/10 text-zinc-400'}`}
+                                className={`p-2 rounded-lg transition-colors ${showShareModal ? 'bg-brand-accent text-white' : 'hover:bg-white/10 text-zinc-400'}`}
                                 title="Share Party"
                             >
                                 <Share2 size={18} />
@@ -363,7 +363,7 @@ export default function WatchPartyChat({
                 >
                     Chat
                     {activeTab === 'chat' && (
-                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-purple" />
+                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-accent" />
                     )}
                 </button>
                 <button
@@ -373,7 +373,7 @@ export default function WatchPartyChat({
                 >
                     Participants ({participants.length})
                     {activeTab === 'participants' && (
-                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-purple" />
+                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-accent" />
                     )}
                 </button>
             </div>
@@ -399,7 +399,7 @@ export default function WatchPartyChat({
                                         className={`max-w-[85%] px-4 py-2 rounded-2xl text-sm ${msg.isSystem
                                             ? 'bg-white/10 text-zinc-400 text-xs py-1 px-3 rounded-full'
                                             : msg.senderId === session?.user?.name
-                                                ? 'bg-brand-purple text-white rounded-tr-none'
+                                                ? 'bg-brand-accent text-white rounded-tr-none'
                                                 : 'bg-white/10 text-zinc-200 rounded-tl-none'
                                             }`}
                                     >
@@ -419,12 +419,12 @@ export default function WatchPartyChat({
                                     onChange={(e) => setNewMessage(e.target.value)}
                                     placeholder={isDisabled ? "Chat disabled by host" : "Type a message..."}
                                     disabled={isDisabled || !session || isSending}
-                                    className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-white text-sm focus:outline-none focus:border-brand-purple/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-white text-sm focus:outline-none focus:border-brand-accent/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                 />
                                 <button
                                     type="submit"
                                     disabled={!newMessage.trim() || isDisabled || !session || isSending}
-                                    className="w-10 h-10 rounded-full bg-brand-purple flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-purple/80 transition-colors relative"
+                                    className="w-10 h-10 rounded-full bg-brand-accent flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-accent/80 transition-colors relative"
                                 >
                                     {isSending ? (
                                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

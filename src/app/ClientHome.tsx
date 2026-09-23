@@ -7,80 +7,32 @@ import MovieSection from '@/components/MovieSection';
 import AIRecommendations from '@/components/AIRecommendations';
 import MovieDetailsModal from '@/components/MovieDetailsModal';
 import Footer from '@/components/Footer';
-import { IMovie } from '@/models/Movie';
+import type { IMovie } from '@/models/Movie';
 import { extractBingrTvParams } from '@/lib/embed';
 
-interface ClientHomeProps {
-    featuredMovies: IMovie[];
-    moviesByGenre: { genre: string; movies: IMovie[] }[];
-    allMovies: IMovie[];
-}
+interface ClientHomeProps { featuredMovies: IMovie[]; moviesByGenre: { genre: string; movies: IMovie[] }[]; allMovies: IMovie[]; }
 
-export default function ClientHome({
-    featuredMovies,
-    moviesByGenre,
-    allMovies,
-}: ClientHomeProps) {
+export default function ClientHome({ featuredMovies, moviesByGenre, allMovies }: ClientHomeProps) {
     const router = useRouter();
     const [selectedMovie, setSelectedMovie] = useState<IMovie | null>(null);
-
+    const [category, setCategory] = useState('All');
     const handlePlay = (movie: IMovie) => {
-        const tvParams = extractBingrTvParams(movie.videoUrl);
-        if (tvParams.isBingrTv && tvParams.tmdbId) {
-            router.push(`/watch/tv/${tvParams.tmdbId}/${tvParams.season || 1}/${tvParams.episode || 1}`);
-            return;
-        }
-        router.push(`/movie/${movie._id}`);
+        const tv = extractBingrTvParams(movie.videoUrl);
+        router.push(tv.isBingrTv && tv.tmdbId ? `/watch/tv/${tv.tmdbId}/${tv.season || 1}/${tv.episode || 1}` : `/movie/${movie._id}`);
     };
-
-    const handleMoreInfo = (movie: IMovie) => {
-        setSelectedMovie(movie);
-    };
-
-    return (
-        <div className="min-h-screen">
-            {/* Hero Section */}
-            <Hero
-                movies={featuredMovies}
-                onPlay={handlePlay}
-                onMoreInfo={handleMoreInfo}
-            />
-
-            {/* Content Sections */}
-            <div className="relative z-10 space-y-8 mt-0 md:-mt-20">
-                {/* AI Recommendations - Featured First */}
-                <AIRecommendations onPlay={handlePlay} />
-
-                {/* Genre Sections */}
-                {moviesByGenre.map((section) => (
-                    <MovieSection
-                        key={section.genre}
-                        title={section.genre}
-                        movies={section.movies}
-                        onPlay={handlePlay}
-                    />
-                ))}
-
-                {/* Fallback if no genres */}
-                {moviesByGenre.length === 0 && allMovies.length > 0 && (
-                    <MovieSection
-                        title="All Movies"
-                        movies={allMovies}
-                        onPlay={handlePlay}
-                    />
-                )}
-            </div>
-
-            {/* Footer */}
-            <Footer />
-
-            {/* Movie Details Modal */}
-            {selectedMovie && (
-                <MovieDetailsModal
-                    movie={selectedMovie}
-                    onClose={() => setSelectedMovie(null)}
-                />
-            )}
+    const heroMovies = [...featuredMovies, ...allMovies.filter(movie => !featuredMovies.some(featured => String(featured._id) === String(movie._id)))].slice(0, 6);
+    const categories = ['All', ...Array.from(new Set(allMovies.flatMap(movie => movie.genre))).slice(0, 8)];
+    return <div className="min-h-screen">
+        <Hero movies={heroMovies} onPlay={handlePlay} onMoreInfo={setSelectedMovie} />
+        <div className="home-content">
+            <div className="catalog-tabs scrollbar-hide" role="group" aria-label="Filter by genre">{categories.map(genre => <button key={genre} className={category === genre ? 'active' : ''} onClick={() => setCategory(genre)} aria-pressed={category === genre}>{genre}</button>)}</div>
+            {category === 'All' ? <>
+                <MovieSection title="Recently added" movies={allMovies.slice(0, 18)} onPlay={setSelectedMovie} />
+                <AIRecommendations onPlay={setSelectedMovie} />
+                {moviesByGenre.map(section => <MovieSection key={section.genre} title={section.genre} movies={section.movies} onPlay={setSelectedMovie} />)}
+            </> : <MovieSection title={`${category} picks`} movies={allMovies.filter(movie => movie.genre.includes(category))} onPlay={setSelectedMovie} />}
         </div>
-    );
+        <Footer />
+        {selectedMovie && <MovieDetailsModal movie={selectedMovie} onClose={() => setSelectedMovie(null)} />}
+    </div>;
 }

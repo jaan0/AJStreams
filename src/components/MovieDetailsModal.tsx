@@ -102,6 +102,13 @@ export default function MovieDetailsModal({ movie, onClose }: MovieDetailsModalP
         fetchEpisodes();
     }, [isTv, tvTmdbId, selectedSeason]);
 
+    useEffect(() => {
+        if (!movie) return;
+        const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape' && !showWatchParty) onClose(); };
+        document.addEventListener('keydown', closeOnEscape);
+        return () => document.removeEventListener('keydown', closeOnEscape);
+    }, [movie, onClose, showWatchParty]);
+
     if (!movie) return null;
 
     const handlePlayMovie = (targetSeason?: number, targetEpisode?: number) => {
@@ -167,11 +174,11 @@ export default function MovieDetailsModal({ movie, onClose }: MovieDetailsModalP
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             className="fixed inset-0 z-[101] flex items-center justify-center p-4 md:p-6"
                         >
-                            <div className="bg-[#101014] border border-white/10 rounded-2xl shadow-2xl overflow-hidden w-full max-w-5xl max-h-[92vh] flex flex-col relative">
+                            <div role="dialog" aria-modal="true" aria-label={movie.title} className="bg-[#101014] border border-white/10 rounded-2xl shadow-2xl overflow-hidden w-full max-w-5xl max-h-[92vh] flex flex-col relative">
                                 {/* Close Button */}
                                 <button
                                     onClick={onClose}
-                                    className="absolute top-4 right-4 z-30 w-10 h-10 rounded-full bg-black/80 hover:bg-black flex items-center justify-center text-white transition-all border border-white/20 hover:scale-110"
+                                    aria-label="Close title details" className="absolute top-4 right-4 z-30 w-10 h-10 rounded-full bg-black/80 hover:bg-black flex items-center justify-center text-white transition-all border border-white/20 hover:scale-110"
                                 >
                                     <X size={20} />
                                 </button>
@@ -196,7 +203,7 @@ export default function MovieDetailsModal({ movie, onClose }: MovieDetailsModalP
                                             {/* Title */}
                                             <div className="space-y-2">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[10px] font-bold tracking-wider uppercase">
+                                                    <span className="px-2.5 py-0.5 rounded-full bg-slate-500/20 text-slate-300 border border-slate-500/30 text-[10px] font-bold tracking-wider uppercase">
                                                         {isTv ? 'TV Series' : 'Movie'}
                                                     </span>
                                                     {isTv && seasons.length > 0 && (
@@ -209,7 +216,7 @@ export default function MovieDetailsModal({ movie, onClose }: MovieDetailsModalP
                                                     {movie.title}
                                                 </h2>
                                                 <div className="flex items-center gap-3 text-sm text-zinc-300">
-                                                    <span className="text-green-400 font-bold">98% Match</span>
+                                                    {movie.rating > 0 && <span className="font-semibold text-zinc-200">★ {movie.rating.toFixed(1)}</span>}
                                                     <span>{movie.year}</span>
                                                     <span className="border border-white/20 px-1.5 py-0.2 rounded text-[10px] text-zinc-400 font-bold uppercase">
                                                         HD
@@ -221,7 +228,7 @@ export default function MovieDetailsModal({ movie, onClose }: MovieDetailsModalP
                                             <div className="flex flex-wrap items-center gap-3 pt-2">
                                                 <button
                                                     onClick={() => handlePlayMovie()}
-                                                    className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-purple-600/30 text-sm"
+                                                    className="btn-primary flex items-center gap-2"
                                                 >
                                                     <Play size={18} fill="currentColor" />
                                                     Play Now
@@ -230,7 +237,7 @@ export default function MovieDetailsModal({ movie, onClose }: MovieDetailsModalP
                                                     onClick={handleAddToList}
                                                     disabled={isLoading}
                                                     className={`w-11 h-11 rounded-xl border flex items-center justify-center transition-all hover:scale-105 ${isFavorite
-                                                        ? 'border-purple-500 bg-purple-500/20 text-purple-400'
+                                                        ? 'border-slate-500 bg-slate-500/20 text-slate-400'
                                                         : 'border-white/15 hover:border-white text-zinc-400 hover:text-white bg-black/40'
                                                         }`}
                                                     title={isFavorite ? 'Remove from My List' : 'Add to My List'}
@@ -249,7 +256,7 @@ export default function MovieDetailsModal({ movie, onClose }: MovieDetailsModalP
                                                 </button>
                                                 <button
                                                     onClick={() => setShowWatchParty(true)}
-                                                    className="w-11 h-11 rounded-xl border border-white/15 hover:border-purple-400 text-zinc-400 hover:text-purple-300 flex items-center justify-center transition-all bg-black/40 hover:scale-105"
+                                                    className="w-11 h-11 rounded-xl border border-white/15 hover:border-slate-400 text-zinc-400 hover:text-slate-300 flex items-center justify-center transition-all bg-black/40 hover:scale-105"
                                                     title="Watch Party"
                                                 >
                                                     <Users size={18} />
@@ -285,7 +292,7 @@ export default function MovieDetailsModal({ movie, onClose }: MovieDetailsModalP
                                         <div className="p-6 md:p-8 border-t border-white/10 bg-black/30 space-y-4">
                                             <div className="flex items-center justify-between">
                                                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                                    <Film size={18} className="text-purple-400" />
+                                                    <Film size={18} className="text-slate-400" />
                                                     Episodes
                                                 </h3>
 
@@ -297,7 +304,7 @@ export default function MovieDetailsModal({ movie, onClose }: MovieDetailsModalP
                                                                 key={s.id || s.seasonNumber}
                                                                 onClick={() => setSelectedSeason(s.seasonNumber)}
                                                                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${selectedSeason === s.seasonNumber
-                                                                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                                                                    ? 'bg-slate-600 text-white shadow-md shadow-slate-600/30'
                                                                     : 'bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white'
                                                                     }`}
                                                             >
@@ -325,7 +332,7 @@ export default function MovieDetailsModal({ movie, onClose }: MovieDetailsModalP
                                                         <div
                                                             key={ep.id || ep.episodeNumber}
                                                             onClick={() => handlePlayMovie(selectedSeason, ep.episodeNumber)}
-                                                            className="flex gap-3 p-2.5 rounded-xl bg-zinc-900/40 hover:bg-purple-950/30 border border-white/5 hover:border-purple-500/40 transition-all cursor-pointer group"
+                                                            className="flex gap-3 p-2.5 rounded-xl bg-zinc-900/40 hover:bg-slate-950/30 border border-white/5 hover:border-slate-500/40 transition-all cursor-pointer group"
                                                         >
                                                             <div className="relative w-24 h-16 rounded-lg overflow-hidden bg-black/60 flex-shrink-0">
                                                                 {ep.stillUrl ? (
@@ -347,7 +354,7 @@ export default function MovieDetailsModal({ movie, onClose }: MovieDetailsModalP
                                                                 </span>
                                                             </div>
                                                             <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                                                <h4 className="text-xs font-bold text-white group-hover:text-purple-300 truncate">
+                                                                <h4 className="text-xs font-bold text-white group-hover:text-slate-300 truncate">
                                                                     {ep.name}
                                                                 </h4>
                                                                 {ep.runtime && (

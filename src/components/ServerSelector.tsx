@@ -47,11 +47,11 @@ export default function ServerSelector({
                 <button
                     type="button"
                     onClick={() => setIsOpen(!isOpen)}
-                    className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-2 rounded-xl bg-black/85 hover:bg-black/95 text-white text-xs font-semibold border border-white/20 hover:border-purple-500/50 shadow-lg backdrop-blur-md transition-all active:scale-95 group shrink-0"
+                    className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-2 rounded-xl bg-black/85 hover:bg-black/95 text-white text-xs font-semibold border border-white/20 hover:border-slate-500/50 shadow-lg backdrop-blur-md transition-all active:scale-95 group shrink-0"
                     aria-expanded={isOpen}
                     title="Switch streaming server (Bingr, VidLink, MultiEmbed)"
                 >
-                    <span className="flex items-center gap-1 text-purple-400 group-hover:text-purple-300">
+                    <span className="flex items-center gap-1 text-slate-400 group-hover:text-slate-300">
                         <Server size={13} />
                         <span className="text-zinc-400 font-normal hidden sm:inline">Server:</span>
                     </span>
@@ -61,7 +61,7 @@ export default function ServerSelector({
                     </span>
                     <ChevronDown
                         size={14}
-                        className={`text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-purple-400' : ''}`}
+                        className={`text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-slate-400' : ''}`}
                     />
                 </button>
 
@@ -108,7 +108,7 @@ export default function ServerSelector({
                             <p className="text-[11px] text-zinc-400">Switch if video is slow or failing</p>
                         </div>
                         <div className="flex items-center gap-1.5">
-                            <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30">
+                            <span className="px-2 py-0.5 rounded bg-slate-500/20 text-slate-300 text-[10px] font-bold border border-slate-500/30">
                                 Fast Switch
                             </span>
                             <button
@@ -135,7 +135,7 @@ export default function ServerSelector({
                                     }}
                                     className={`w-full flex items-center justify-between px-3.5 py-3 sm:py-2.5 rounded-xl text-left transition-all ${
                                         isSelected
-                                            ? 'bg-purple-600/30 border border-purple-500/50 text-white shadow-md'
+                                            ? 'bg-slate-600/30 border border-slate-500/50 text-white shadow-md'
                                             : 'text-zinc-300 hover:bg-white/5 active:bg-white/10 hover:text-white border border-transparent'
                                     }`}
                                 >
@@ -152,7 +152,7 @@ export default function ServerSelector({
                                         </div>
                                     </div>
                                     {isSelected && (
-                                        <div className="w-5 h-5 rounded-full bg-purple-500 flex items-center justify-center text-white shrink-0 ml-2">
+                                        <div className="w-5 h-5 rounded-full bg-slate-500 flex items-center justify-center text-white shrink-0 ml-2">
                                             <Check size={12} strokeWidth={3} />
                                         </div>
                                     )}

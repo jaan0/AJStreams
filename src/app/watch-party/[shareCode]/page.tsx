@@ -113,7 +113,7 @@ export default function WatchPartyPage() {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
-                    <Loader className="animate-spin text-brand-purple mx-auto mb-4" size={48} />
+                    <Loader className="animate-spin text-brand-accent mx-auto mb-4" size={48} />
                     <p className="text-white text-lg">Loading watch party...</p>
                 </div>
             </div>
@@ -155,7 +155,7 @@ export default function WatchPartyPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Enter password"
-                                className="w-full bg-black/30 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-brand-purple/50"
+                                className="w-full bg-black/30 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-brand-accent/50"
                                 required
                                 autoFocus
                             />

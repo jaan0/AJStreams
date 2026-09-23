@@ -28,7 +28,7 @@ export default function ParticipantList({ participants, hostId, currentUserId }:
                         {/* Avatar */}
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-lg ${isHost
                             ? 'bg-gradient-to-br from-yellow-400 to-orange-500'
-                            : 'bg-gradient-to-br from-brand-purple to-brand-pink'
+                            : 'bg-gradient-to-br from-brand-accent to-brand-secondary'
                             }`}>
                             {participant.name.charAt(0).toUpperCase()}
                         </div>

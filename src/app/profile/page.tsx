@@ -16,7 +16,7 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="min-h-screen pt-24 px-4 md:px-12 pb-12">
+        <div className="library-page">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -25,7 +25,7 @@ export default function ProfilePage() {
                 <h1 className="text-3xl font-bold text-white mb-8">My Profile</h1>
 
                 <div className="bg-zinc-900 rounded-xl border border-white/10 overflow-hidden">
-                    <div className="h-32 bg-gradient-to-r from-purple-600 to-pink-600 relative">
+                    <div className="h-32 bg-gradient-to-r from-zinc-800 to-zinc-900 relative">
                         <div className="absolute -bottom-12 left-8">
                             <div className="w-24 h-24 rounded-full bg-zinc-900 p-1">
                                 <div className="w-full h-full rounded-full bg-zinc-800 flex items-center justify-center text-3xl font-bold text-white">

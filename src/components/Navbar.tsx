@@ -1,236 +1,63 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { Search, User, LogOut, PlusCircle, Menu, X } from 'react-feather';
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
+import { Home, Search, Film, Bookmark, Users, User, PlusCircle, LogOut, Grid, HelpCircle } from 'react-feather';
 import AuthModal from './AuthModal';
 import RequestMovieModal from './RequestMovieModal';
 import SearchModal from './SearchModal';
 
 export default function Navbar() {
+    const pathname = usePathname();
     const { data: session } = useSession();
-    const [isScrolled, setIsScrolled] = useState(false);
-    const [showAuthModal, setShowAuthModal] = useState(false);
-    const [showRequestModal, setShowRequestModal] = useState(false);
-    const [showSearchModal, setShowSearchModal] = useState(false);
-    const [showProfileMenu, setShowProfileMenu] = useState(false);
-    const [showMobileMenu, setShowMobileMenu] = useState(false);
-
-    const { scrollY } = useScroll();
+    const [showAuth, setShowAuth] = useState(false);
+    const [showRequest, setShowRequest] = useState(false);
+    const [showSearch, setShowSearch] = useState(false);
+    const isPlayer = pathname?.startsWith('/watch/') || pathname?.startsWith('/movie/') || pathname?.startsWith('/watch-party/');
 
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-                e.preventDefault();
-                setShowSearchModal((prev) => !prev);
-            }
+        const keydown = (event: KeyboardEvent) => {
+            if ((event.metaKey || event.ctrlKey) && event.key === 'k') { event.preventDefault(); setShowSearch(value => !value); }
+            if (event.key === 'Escape') { setShowAuth(false); setShowSearch(false); setShowRequest(false); }
         };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
+        window.addEventListener('keydown', keydown);
+        if (new URLSearchParams(window.location.search).get('login') === 'true') setShowAuth(true);
+        return () => window.removeEventListener('keydown', keydown);
     }, []);
 
-    useMotionValueEvent(scrollY, "change", (latest) => {
-        setIsScrolled(latest > 50);
-    });
+    const links = [
+        { href: '/', label: 'Home', Icon: Home },
+        { href: '/movies', label: 'Movies & TV', Icon: Film },
+        { href: '/my-list', label: 'My List', Icon: Bookmark },
+        { href: '/watch-parties', label: 'Watch Parties', Icon: Users },
+        { href: '/account', label: 'My Space', Icon: User },
+    ];
 
-    return (
-        <>
-            <motion.nav
-                className={`fixed top-0 left-0 right-0 z-50 flex items-center transition-all duration-300 ${
-                    isScrolled
-                        ? 'bg-[#0a0a0a]/90 backdrop-blur-md border-b border-white/10 shadow-lg shadow-black/30'
-                        : 'bg-gradient-to-b from-black/90 via-black/40 to-transparent border-b border-transparent'
-                }`}
-                style={{
-                    paddingTop: 'env(safe-area-inset-top, 0px)',
-                    paddingLeft: 'max(0.75rem, env(safe-area-inset-left, 0px))',
-                    paddingRight: 'max(0.75rem, env(safe-area-inset-right, 0px))',
-                    minHeight: 'calc(4rem + env(safe-area-inset-top, 0px))',
-                }}
-            >
-                <div className="w-full h-16 md:h-20 px-3 md:px-12 flex items-center justify-between">
-                    {/* Left Section */}
-                    <div className="flex items-center gap-4 md:gap-8">
-                        {/* Mobile Menu Button */}
-                        <button
-                            onClick={() => setShowMobileMenu(true)}
-                            className="md:hidden text-zinc-300 hover:text-white p-2"
-                        >
-                            <Menu size={24} />
-                        </button>
-
-                        <Link
-                            href="/"
-                            className="hover:opacity-80 transition-opacity"
-                        >
-                            <img src="/logo.png" alt="Logo" className="h-10 md:h-14" />
-                        </Link>
-
-                        {/* Desktop Navigation Links */}
-                        <div className="hidden md:flex gap-6 text-sm font-medium text-zinc-300">
-                            <Link href="/" className="hover:text-white transition-colors">Home</Link>
-                            <Link href="/movies" className="hover:text-white transition-colors">Movies</Link>
-                            {session && (
-                                <>
-                                    <Link href="/my-list" className="hover:text-white transition-colors">My List</Link>
-                                    <Link href="/watch-parties" className="hover:text-white transition-colors">Watch Parties</Link>
-                                </>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Right Section */}
-                    <div className="flex items-center gap-2 md:gap-4">
-                        {/* Modern Desktop Search Pill */}
-                        <button
-                            onClick={() => setShowSearchModal(true)}
-                            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-500/40 text-zinc-400 hover:text-white transition-all text-xs shadow-inner"
-                            aria-label="Search library"
-                        >
-                            <Search size={14} className="text-purple-400" />
-                            <span className="text-zinc-500">Search titles, series...</span>
-                            <kbd className="px-1.5 py-0.5 rounded bg-black/60 border border-white/10 text-[10px] text-zinc-400 font-mono">
-                                ⌘K
-                            </kbd>
-                        </button>
-
-                        {/* Mobile Search Icon Button */}
-                        <button
-                            onClick={() => setShowSearchModal(true)}
-                            className="md:hidden text-zinc-300 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
-                            aria-label="Search"
-                        >
-                            <Search size={20} />
-                        </button>
-
-                        <button
-                            onClick={() => setShowRequestModal(true)}
-                            className="text-zinc-300 hover:text-brand-purple transition-all flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-white/5 border border-transparent hover:border-white/10"
-                        >
-                            <PlusCircle size={18} />
-                            <span className="hidden md:inline">Request</span>
-                        </button>
-
-                        {session ? (
-                            <div className="relative">
-                                <button onClick={() => setShowProfileMenu(!showProfileMenu)}>
-                                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-gradient-brand flex items-center justify-center text-white font-bold text-sm shadow-glow">
-                                        {session.user?.name?.[0] || 'U'}
-                                    </div>
-                                </button>
-
-                                <AnimatePresence>
-                                    {showProfileMenu && (
-                                        <>
-                                            {/* Mobile Backdrop */}
-                                            <div
-                                                className="fixed inset-0 z-40 md:hidden"
-                                                onClick={() => setShowProfileMenu(false)}
-                                            />
-
-                                            <motion.div
-                                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                transition={{ duration: 0.2 }}
-                                                className="absolute right-0 top-full mt-3 w-56 bg-zinc-900 border border-white/10 rounded-lg shadow-2xl z-50 origin-top-right"
-                                            >
-                                                <div className="p-2">
-                                                    <div className="p-2 mb-2 border-b border-white/10">
-                                                        <p className="font-bold text-white truncate">{session.user?.name}</p>
-                                                        <p className="text-xs text-zinc-400 truncate">{session.user?.email}</p>
-                                                    </div>
-                                                    <Link href="/profile" className="menu-item" onClick={() => setShowProfileMenu(false)}>
-                                                        <User size={16} /> Profile
-                                                    </Link>
-                                                    {(session.user as any).role === 'admin' && (
-                                                        <Link href="/admin" className="menu-item" onClick={() => setShowProfileMenu(false)}>
-                                                            Admin
-                                                        </Link>
-                                                    )}
-                                                    <button onClick={() => signOut()} className="menu-item w-full text-red-400">
-                                                        <LogOut size={16} /> Sign Out
-                                                    </button>
-                                                </div>
-                                            </motion.div>
-                                        </>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        ) : (
-                            <button onClick={() => setShowAuthModal(true)} className="btn-primary text-xs md:text-sm px-4 py-2 md:px-6 md:py-2">
-                                Sign In
-                            </button>
-                        )}
-                    </div>
+    return <>
+        {!isPlayer && <>
+            <aside className="navigation-rail">
+                <Link href="/" aria-label="AJStreams home" className="rail-brand"><span className="brand-symbol">a<span>j</span></span><span className="rail-label brand-name">AJStreams</span></Link>
+                <nav aria-label="Main navigation" className="rail-links">
+                    {links.slice(0, 1).map(({ href, label, Icon }) => <Link key={href} href={href} aria-label={label} aria-current={pathname === href ? 'page' : undefined} className={`rail-link ${pathname === href ? 'active' : ''}`}><Icon size={23} /><span className="rail-label">{label}</span></Link>)}
+                    <button className="rail-link" aria-label="Search library" onClick={() => setShowSearch(true)}><Search size={23} /><span className="rail-label">Search <kbd>⌘ K</kbd></span></button>
+                    {links.slice(1).map(({ href, label, Icon }) => <Link key={href} href={href} aria-label={label} aria-current={pathname?.startsWith(href) ? 'page' : undefined} className={`rail-link ${pathname?.startsWith(href) ? 'active' : ''}`}><Icon size={23} /><span className="rail-label">{label}</span></Link>)}
+                    <button className="rail-link" aria-label="Request a title" onClick={() => setShowRequest(true)}><PlusCircle size={23} /><span className="rail-label">Request a title</span></button>
+                    {session?.user && (session.user as { role?: string }).role === 'admin' && <Link href="/admin" className="rail-link" aria-label="Admin"><Grid size={23} /><span className="rail-label">Admin</span></Link>}
+                </nav>
+                <div className="rail-bottom">
+                    <Link href="/help" className="rail-link" aria-label="Help center"><HelpCircle size={21} /><span className="rail-label">Help center</span></Link>
+                    <button className="rail-link" aria-label={session ? 'Sign out' : 'Sign in'} onClick={() => session ? signOut({ callbackUrl: '/' }) : setShowAuth(true)}>{session ? <LogOut size={21} /> : <User size={21} />}<span className="rail-label">{session ? 'Sign out' : 'Sign in'}</span></button>
                 </div>
-            </motion.nav>
-
-            {/* Mobile Menu Drawer */}
-            <AnimatePresence>
-                {showMobileMenu && (
-                    <>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm md:hidden"
-                            onClick={() => setShowMobileMenu(false)}
-                        />
-                        <motion.div
-                            initial={{ x: '-100%' }}
-                            animate={{ x: 0 }}
-                            exit={{ x: '-100%' }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="fixed top-0 left-0 bottom-0 z-50 w-64 bg-zinc-900 border-r border-white/10 p-6 md:hidden flex flex-col"
-                            style={{
-                                paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
-                                paddingLeft: 'max(1.5rem, env(safe-area-inset-left, 1.5rem))',
-                            }}
-                        >
-                            <div className="flex items-center justify-between mb-8">
-                                <img src="/logo.png" alt="Logo" className="h-8" />
-                                <button
-                                    onClick={() => setShowMobileMenu(false)}
-                                    className="text-zinc-400 hover:text-white"
-                                >
-                                    <X size={24} />
-                                </button>
-                            </div>
-
-                            <div className="space-y-4">
-                                <Link href="/" className="block text-lg font-medium text-zinc-300 hover:text-white" onClick={() => setShowMobileMenu(false)}>Home</Link>
-                                <Link href="/movies" className="block text-lg font-medium text-zinc-300 hover:text-white" onClick={() => setShowMobileMenu(false)}>Movies</Link>
-                                {session && (
-                                    <>
-                                        <Link href="/my-list" className="block text-lg font-medium text-zinc-300 hover:text-white" onClick={() => setShowMobileMenu(false)}>My List</Link>
-                                        <Link href="/watch-parties" className="block text-lg font-medium text-zinc-300 hover:text-white" onClick={() => setShowMobileMenu(false)}>Watch Parties</Link>
-                                    </>
-                                )}
-                            </div>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
-
-            <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
-            <RequestMovieModal isOpen={showRequestModal} onClose={() => setShowRequestModal(false)} />
-            <SearchModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} />
-        </>
-    );
-}
-
-// Helper for menu items
-function MenuItem({ children, ...props }: any) {
-    return (
-        <Link
-            href="#"
-            className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors"
-            {...props}
-        >
-            {children}
-        </Link>
-    );
+            </aside>
+            <header className="mobile-header">
+                <Link href="/" aria-label="AJStreams home" className="brand-name"><span className="brand-symbol">aj</span><span>AJStreams</span></Link>
+                <div className="flex gap-2"><button className="icon-button" aria-label="Request a title" onClick={() => setShowRequest(true)}><PlusCircle size={20} /></button><button className="icon-button" aria-label="Search library" onClick={() => setShowSearch(true)}><Search size={20} /></button></div>
+            </header>
+        </>}
+        <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />
+        <RequestMovieModal isOpen={showRequest} onClose={() => setShowRequest(false)} />
+        <SearchModal isOpen={showSearch} onClose={() => setShowSearch(false)} />
+    </>;
 }

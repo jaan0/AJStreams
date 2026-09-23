@@ -5,8 +5,8 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
-  "theme_color": "#7c3aed",
-  "orientation": "portrait-primary",
+  "theme_color": "#0f1014",
+  "orientation": "any",
   "scope": "/",
   "lang": "en",
   "categories": ["entertainment", "video"],
@@ -58,15 +58,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshots/home.jpg",
-      "sizes": "1280x720",
-      "type": "image/jpeg",
-      "form_factor": "wide",
-      "label": "AJStreams Home"
     }
   ],
   "shortcuts": [

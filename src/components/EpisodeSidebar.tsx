@@ -149,7 +149,7 @@ export default function EpisodeSidebar({
                     <div className="p-4 border-b border-white/10 bg-[#121215] relative z-40">
                         <div className="flex items-center justify-between gap-3 mb-3">
                             <div className="flex items-center gap-2 min-w-0">
-                                <span className="p-1.5 rounded-lg bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                                <span className="p-1.5 rounded-lg bg-slate-500/20 text-slate-400 border border-slate-500/30">
                                     <Layers size={16} />
                                 </span>
                                 <h3 className="text-white font-bold text-base truncate">
@@ -172,10 +172,10 @@ export default function EpisodeSidebar({
                                 <button
                                     type="button"
                                     onClick={() => setSeasonDropdownOpen(!seasonDropdownOpen)}
-                                    className="w-full flex items-center justify-between px-3 py-2 bg-black/80 hover:bg-black border border-white/15 hover:border-purple-500/60 rounded-xl text-white text-xs font-semibold transition-all shadow-inner"
+                                    className="w-full flex items-center justify-between px-3 py-2 bg-black/80 hover:bg-black border border-white/15 hover:border-slate-500/60 rounded-xl text-white text-xs font-semibold transition-all shadow-inner"
                                 >
                                     <span className="flex items-center gap-2 truncate">
-                                        <Film size={14} className="text-purple-400 flex-shrink-0" />
+                                        <Film size={14} className="text-slate-400 flex-shrink-0" />
                                         <span>
                                             {seasons.find(s => s.seasonNumber === selectedSeason)?.name || `Season ${selectedSeason}`}
                                         </span>
@@ -212,12 +212,12 @@ export default function EpisodeSidebar({
                                                                 setSeasonDropdownOpen(false);
                                                             }}
                                                             className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs text-left transition-colors ${selectedSeason === s.seasonNumber
-                                                                ? 'bg-purple-600 text-white font-bold'
+                                                                ? 'bg-slate-600 text-white font-bold'
                                                                 : 'text-zinc-200 hover:bg-white/10 hover:text-white'
                                                                 }`}
                                                         >
                                                             <span>{s.name}</span>
-                                                            <span className={`text-[10px] ${selectedSeason === s.seasonNumber ? 'text-purple-200' : 'text-zinc-400'}`}>
+                                                            <span className={`text-[10px] ${selectedSeason === s.seasonNumber ? 'text-slate-200' : 'text-zinc-400'}`}>
                                                                 {s.episodeCount ? `${s.episodeCount} eps` : ''}
                                                             </span>
                                                         </button>
@@ -232,7 +232,7 @@ export default function EpisodeSidebar({
                                                                 setSeasonDropdownOpen(false);
                                                             }}
                                                             className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs text-left transition-colors ${selectedSeason === num
-                                                                ? 'bg-purple-600 text-white font-bold'
+                                                                ? 'bg-slate-600 text-white font-bold'
                                                                 : 'text-zinc-200 hover:bg-white/10 hover:text-white'
                                                                 }`}
                                                         >
@@ -254,12 +254,12 @@ export default function EpisodeSidebar({
                                     placeholder="Jump to Ep #"
                                     value={quickJumpInput}
                                     onChange={e => setQuickJumpInput(e.target.value)}
-                                    className="w-24 px-2.5 py-2 bg-black/80 border border-white/15 focus:border-purple-500/60 rounded-xl text-white text-xs placeholder:text-zinc-500 focus:outline-none"
+                                    className="w-24 px-2.5 py-2 bg-black/80 border border-white/15 focus:border-slate-500/60 rounded-xl text-white text-xs placeholder:text-zinc-500 focus:outline-none"
                                 />
                                 <button
                                     type="submit"
                                     disabled={!quickJumpInput.trim()}
-                                    className="px-2.5 py-2 bg-purple-600 hover:bg-purple-500 disabled:opacity-30 text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center"
+                                    className="px-2.5 py-2 bg-slate-600 hover:bg-slate-500 disabled:opacity-30 text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center"
                                     title="Jump to episode"
                                 >
                                     <ArrowRight size={13} />
@@ -272,7 +272,7 @@ export default function EpisodeSidebar({
                     <div className="flex-1 overflow-y-auto p-3 space-y-2.5 scrollbar-thin scrollbar-thumb-zinc-800">
                         {isLoadingEpisodes ? (
                             <div className="flex flex-col items-center justify-center py-20 text-zinc-400">
-                                <Loader size={28} className="animate-spin text-purple-500 mb-2" />
+                                <Loader size={28} className="animate-spin text-slate-500 mb-2" />
                                 <p className="text-xs">Loading season episodes...</p>
                             </div>
                         ) : episodes.length === 0 ? (
@@ -290,7 +290,7 @@ export default function EpisodeSidebar({
                                             key={epNum}
                                             onClick={() => onSelectEpisode(selectedSeason, epNum)}
                                             className={`p-2 rounded-xl text-xs font-bold border transition-all ${epNum === currentEpisode && selectedSeason === currentSeason
-                                                ? 'bg-purple-600 border-purple-400 text-white'
+                                                ? 'bg-slate-600 border-slate-400 text-white'
                                                 : 'bg-white/5 border-white/5 text-zinc-300 hover:bg-white/10'
                                                 }`}
                                         >
@@ -310,7 +310,7 @@ export default function EpisodeSidebar({
                                         key={ep.id || ep.episodeNumber}
                                         onClick={() => onSelectEpisode(selectedSeason, ep.episodeNumber)}
                                         className={`group relative flex gap-3 p-2.5 rounded-xl border transition-all cursor-pointer ${isCurrent
-                                            ? 'bg-purple-950/40 border-purple-500/60 shadow-lg shadow-purple-950/50'
+                                            ? 'bg-slate-950/40 border-slate-500/60 shadow-lg shadow-slate-950/50'
                                             : 'bg-zinc-900/40 hover:bg-zinc-900/80 border-white/5 hover:border-white/15'
                                             }`}
                                     >
@@ -327,7 +327,7 @@ export default function EpisodeSidebar({
                                                     }}
                                                 />
                                             ) : (
-                                                <div className="w-full h-full bg-gradient-to-br from-purple-950/50 to-zinc-900 flex items-center justify-center">
+                                                <div className="w-full h-full bg-gradient-to-br from-slate-950/50 to-zinc-900 flex items-center justify-center">
                                                     <Film size={20} className="text-zinc-600" />
                                                 </div>
                                             )}
@@ -337,7 +337,7 @@ export default function EpisodeSidebar({
                                                 className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${isCurrent ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                                                     }`}
                                             >
-                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isCurrent ? 'bg-purple-600 text-white' : 'bg-white/90 text-black'}`}>
+                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isCurrent ? 'bg-slate-600 text-white' : 'bg-white/90 text-black'}`}>
                                                     <Play size={14} fill="currentColor" className="ml-0.5" />
                                                 </div>
                                             </div>
@@ -352,12 +352,12 @@ export default function EpisodeSidebar({
                                         <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
                                             <div>
                                                 <div className="flex items-start justify-between gap-1">
-                                                    <h4 className={`text-xs font-bold truncate leading-tight ${isCurrent ? 'text-purple-300' : 'text-white group-hover:text-purple-200'}`}>
+                                                    <h4 className={`text-xs font-bold truncate leading-tight ${isCurrent ? 'text-slate-300' : 'text-white group-hover:text-slate-200'}`}>
                                                         {ep.name}
                                                     </h4>
                                                     {isCurrent && (
-                                                        <span className="flex-shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-500/20 border border-purple-500/40 text-[9px] font-bold text-purple-300">
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-ping" />
+                                                        <span className="flex-shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-500/20 border border-slate-500/40 text-[9px] font-bold text-slate-300">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-ping" />
                                                             PLAYING
                                                         </span>
                                                     )}
@@ -421,7 +421,7 @@ export default function EpisodeSidebar({
                     <div className="p-4 border-b border-white/10 bg-[#121215] relative z-40">
                         <div className="flex items-center justify-between gap-3 mb-3">
                             <div className="flex items-center gap-2 min-w-0">
-                                <span className="p-1.5 rounded-lg bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                                <span className="p-1.5 rounded-lg bg-slate-500/20 text-slate-400 border border-slate-500/30">
                                     <Layers size={16} />
                                 </span>
                                 <h3 className="text-white font-bold text-base truncate">{seriesTitle}</h3>
@@ -440,7 +440,7 @@ export default function EpisodeSidebar({
                     <div className="flex-1 overflow-y-auto p-3 space-y-2">
                         {isLoadingEpisodes ? (
                             <div className="flex flex-col items-center justify-center h-40 gap-3">
-                                <Loader className="animate-spin text-purple-400" size={28} />
+                                <Loader className="animate-spin text-slate-400" size={28} />
                                 <p className="text-zinc-500 text-sm">Loading episodes...</p>
                             </div>
                         ) : episodes.map((ep) => {
@@ -451,7 +451,7 @@ export default function EpisodeSidebar({
                                     onClick={() => { onSelectEpisode(selectedSeason, ep.episodeNumber); onClose(); }}
                                     className={`w-full flex items-start gap-3 p-3 rounded-xl text-left transition-all ${
                                         isCurrentEp
-                                            ? 'bg-purple-600/25 border border-purple-500/40'
+                                            ? 'bg-slate-600/25 border border-slate-500/40'
                                             : 'hover:bg-white/5 border border-transparent'
                                     }`}
                                 >
@@ -471,7 +471,7 @@ export default function EpisodeSidebar({
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-[11px] text-zinc-500 font-medium">E{ep.episodeNumber}</p>
-                                        <p className={`text-xs font-semibold line-clamp-2 ${isCurrentEp ? 'text-purple-300' : 'text-white'}`}>
+                                        <p className={`text-xs font-semibold line-clamp-2 ${isCurrentEp ? 'text-slate-300' : 'text-white'}`}>
                                             {ep.name}
                                         </p>
                                         {ep.runtime && (

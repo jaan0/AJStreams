@@ -74,11 +74,11 @@ export default function PWAInstallBanner() {
     if (!showBanner || isInstalled) return null;
 
     return (
-        <div className="fixed bottom-20 md:bottom-6 left-4 right-4 md:left-auto md:right-6 md:w-80 z-[200] animate-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-zinc-900 border border-purple-500/30 rounded-2xl p-4 shadow-2xl shadow-purple-900/30 backdrop-blur-xl">
+        <div className="fixed bottom-[calc(96px+env(safe-area-inset-bottom))] md:bottom-6 left-4 right-4 md:left-auto md:right-6 md:w-80 z-[200] animate-in slide-in-from-bottom-4 duration-500">
+            <div className="bg-zinc-900 border border-slate-500/30 rounded-2xl p-4 shadow-2xl shadow-slate-900/30 backdrop-blur-xl">
                 <div className="flex items-start gap-3">
                     {/* Icon */}
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-600 to-slate-600 flex items-center justify-center shrink-0">
                         <img src="/logo.png" alt="AJStreams" className="w-8 h-8 object-contain" />
                     </div>
 
@@ -93,7 +93,7 @@ export default function PWAInstallBanner() {
                         {!isIOS && deferredPrompt && (
                             <button
                                 onClick={handleInstall}
-                                className="mt-2 flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-lg transition-colors"
+                                className="mt-2 flex items-center gap-1.5 px-3 py-1.5 bg-slate-600 hover:bg-slate-500 text-white text-xs font-semibold rounded-lg transition-colors"
                             >
                                 <Download size={13} />
                                 Install App
@@ -119,3 +119,4 @@ export default function PWAInstallBanner() {
         </div>
     );
 }
+

@@ -578,7 +578,7 @@ export default function VideoPlayer({
 
                 {/* Sync Indicator */}
                 {isSyncing && (
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-brand-purple/90 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-medium z-40 pointer-events-none">
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-brand-accent/90 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-medium z-40 pointer-events-none">
                         Syncing...
                     </div>
                 )}
@@ -613,7 +613,7 @@ export default function VideoPlayer({
                                         value={currentTime}
                                         onChange={(e) => handleSeek(parseFloat(e.target.value))}
                                         disabled={!!(partyId && !isHost)}
-                                        className="w-full h-full cursor-pointer appearance-none bg-transparent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-brand-purple [&::-webkit-slider-thumb]:cursor-pointer disabled:cursor-not-allowed"
+                                        className="w-full h-full cursor-pointer appearance-none bg-transparent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-brand-accent [&::-webkit-slider-thumb]:cursor-pointer disabled:cursor-not-allowed"
                                         style={{
                                             background: `linear-gradient(to right, rgb(168, 85, 247) 0%, rgb(168, 85, 247) ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) 100%)`
                                         }}

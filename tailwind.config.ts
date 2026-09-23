@@ -12,20 +12,20 @@ const config: Config = {
                 background: "var(--background)",
                 foreground: "var(--foreground)",
                 brand: {
-                    purple: '#9333ea',  // Primary purple
-                    pink: '#db2777',    // Primary pink
+                    accent: '#64748b',  // Primary purple
+                    secondary: '#475569',    // Primary pink
                 },
                 primary: {
-                    bg: '#0a0a0a',      // Primary background
+                    bg: '#08090b',      // Primary background
                 },
                 card: {
                     bg: 'rgba(255,255,255,0.05)', // Card background
                 }
             },
             boxShadow: {
-                'glow': '0 0 20px rgba(147,51,234,0.5)',
-                'glow-lg': '0 0 30px rgba(147,51,234,0.6)',
-                'glow-pink': '0 0 20px rgba(219,39,119,0.5)',
+                'glow': '0 0 20px rgba(255,255,255,0.08)',
+                'glow-lg': '0 0 30px rgba(255,255,255,0.12)',
+                'glow-pink': '0 0 20px rgba(255,255,255,0.08)',
             },
             spacing: {
                 // 4px base unit system
@@ -46,13 +46,13 @@ const config: Config = {
             borderRadius: {
                 'modal': '16px',
                 'card': '12px',
-                'button': '8px',
+                'button': '999px',
             },
             backgroundImage: {
                 'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
                 'conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
                 'hero-glow': 'conic-gradient(from 90deg at 50% 50%, #00000000 50%, #000 50%), radial-gradient(rgba(200,200,200,0.1) 0%, transparent 80%)',
-                'gradient-purple-pink': 'linear-gradient(135deg, #9333ea 0%, #db2777 100%)',
+                'gradient-neutral': 'linear-gradient(135deg, #475569 0%, #334155 100%)',
             },
             animation: {
                 'slide-up': 'slideUp 0.3s ease-out',

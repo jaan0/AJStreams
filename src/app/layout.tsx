@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 import Navbar from '@/components/Navbar';
+import AppShell from '@/components/AppShell';
 import BottomNav from '@/components/BottomNav';
 import { Toaster } from 'react-hot-toast';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
@@ -48,12 +49,11 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
     width: 'device-width',
     initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
+    userScalable: true,
     viewportFit: 'cover',
     themeColor: [
-        { media: '(prefers-color-scheme: light)', color: '#7c3aed' },
-        { media: '(prefers-color-scheme: dark)', color: '#7c3aed' },
+        { media: '(prefers-color-scheme: light)', color: '#0f1014' },
+        { media: '(prefers-color-scheme: dark)', color: '#0f1014' },
     ],
 };
 
@@ -71,7 +71,7 @@ export default function RootLayout({
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
                 <meta name="apple-mobile-web-app-title" content="AJStreams" />
                 <meta name="application-name" content="AJStreams" />
-                <meta name="msapplication-TileColor" content="#7c3aed" />
+                <meta name="msapplication-TileColor" content="#0f1014" />
                 <meta name="format-detection" content="telephone=no" />
                 {/* Splash screens for iOS */}
                 <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
@@ -80,9 +80,9 @@ export default function RootLayout({
             <body className={`${inter.className} pb-safe`}>
                 <Providers>
                     <Navbar />
-                    <main className="min-h-screen bg-black text-white pt-16 md:pt-20 pb-16 md:pb-0">
+                    <AppShell>
                         {children}
-                    </main>
+                    </AppShell>
                     <BottomNav />
                     <PWAInstallBanner />
                     <PWARegister />

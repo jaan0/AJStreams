@@ -85,7 +85,7 @@ export default function TvWatchPage() {
     if (isLoading) {
         return (
             <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white">
-                <Loader className="animate-spin text-purple-500 mb-4" size={40} />
+                <Loader className="animate-spin text-slate-500 mb-4" size={40} />
                 <p className="text-sm font-medium text-zinc-400">Loading series stream...</p>
             </div>
         );
@@ -124,10 +124,10 @@ export default function TvWatchPage() {
                 {/* Desktop: Right-side floating Episodes tab (md+) */}
                 <button
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                    className="hidden md:flex fixed right-0 top-1/2 -translate-y-1/2 z-40 items-center gap-2 bg-gradient-to-l from-purple-700 to-purple-600 hover:from-purple-600 hover:to-purple-500 text-white pl-3.5 pr-2.5 py-3 rounded-l-2xl shadow-[0_0_30px_rgba(168,85,247,0.5)] border-y border-l border-white/20 transition-all hover:pl-4 group"
+                    className="hidden md:flex fixed right-0 top-1/2 -translate-y-1/2 z-40 items-center gap-2 bg-gradient-to-l from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white pl-3.5 pr-2.5 py-3 rounded-l-2xl shadow-[0_0_30px_rgba(168,85,247,0.5)] border-y border-l border-white/20 transition-all hover:pl-4 group"
                     title="Open Episodes list"
                 >
-                    <Layers size={16} className="text-purple-200 group-hover:scale-110 transition-transform" />
+                    <Layers size={16} className="text-slate-200 group-hover:scale-110 transition-transform" />
                     <span className="text-xs font-bold tracking-wider uppercase">Episodes</span>
                 </button>
 
@@ -148,11 +148,11 @@ export default function TvWatchPage() {
                     {/* Center: Current episode + Episodes button */}
                     <button
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="flex items-center gap-2 px-4 py-2 bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/40 rounded-xl text-white text-xs font-bold transition-all active:scale-95"
+                        className="flex items-center gap-2 px-4 py-2 bg-slate-600/30 hover:bg-slate-600/50 border border-slate-500/40 rounded-xl text-white text-xs font-bold transition-all active:scale-95"
                     >
                         <Layers size={13} />
                         <span>S{season}:E{episode}</span>
-                        <span className="text-purple-300">Episodes</span>
+                        <span className="text-slate-300">Episodes</span>
                     </button>
 
                     {/* Next episode */}

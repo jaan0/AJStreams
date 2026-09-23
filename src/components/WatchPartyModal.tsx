@@ -236,7 +236,7 @@ export default function WatchPartyModal({
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm text-zinc-400">Share Code</span>
-                                            <span className="text-brand-purple font-mono font-bold">{createdParty.shareCode}</span>
+                                            <span className="text-brand-accent font-mono font-bold">{createdParty.shareCode}</span>
                                         </div>
                                         {createdParty.isPrivate && (
                                             <div className="flex items-center gap-2 text-yellow-500 text-sm">
@@ -367,7 +367,7 @@ export default function WatchPartyModal({
                                                                         </button>
                                                                         <button
                                                                             onClick={() => handleJoinParty(party)}
-                                                                            className="px-4 py-2 bg-brand-purple hover:bg-brand-purple/80 text-white rounded-lg font-medium transition-colors"
+                                                                            className="px-4 py-2 bg-brand-accent hover:bg-brand-accent/80 text-white rounded-lg font-medium transition-colors"
                                                                         >
                                                                             Join
                                                                         </button>
@@ -402,7 +402,7 @@ export default function WatchPartyModal({
                                                     value={partyName}
                                                     onChange={(e) => setPartyName(e.target.value)}
                                                     placeholder="e.g., Movie Night with Friends"
-                                                    className="w-full bg-black/30 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-brand-purple/50"
+                                                    className="w-full bg-black/30 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-brand-accent/50"
                                                     required
                                                 />
                                             </div>
@@ -429,7 +429,7 @@ export default function WatchPartyModal({
                                                         value={password}
                                                         onChange={(e) => setPassword(e.target.value)}
                                                         placeholder="Set a password"
-                                                        className="w-full bg-black/30 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-brand-purple/50"
+                                                        className="w-full bg-black/30 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-brand-accent/50"
                                                         required={isPrivate}
                                                     />
                                                 </div>
@@ -479,7 +479,7 @@ export default function WatchPartyModal({
                                         value={joinPassword}
                                         onChange={(e) => setJoinPassword(e.target.value)}
                                         placeholder="Enter password"
-                                        className="w-full bg-black/30 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-brand-purple/50"
+                                        className="w-full bg-black/30 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-brand-accent/50"
                                         required
                                         autoFocus
                                     />

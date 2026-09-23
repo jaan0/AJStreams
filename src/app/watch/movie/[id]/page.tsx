@@ -41,7 +41,7 @@ export default function MovieWatchPage() {
     if (isLoading) {
         return (
             <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white">
-                <Loader className="animate-spin text-purple-500 mb-4" size={40} />
+                <Loader className="animate-spin text-slate-500 mb-4" size={40} />
                 <p className="text-sm font-medium text-zinc-400">Loading movie stream...</p>
             </div>
         );

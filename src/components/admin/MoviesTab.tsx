@@ -276,7 +276,7 @@ export default function MoviesTab() {
                 <div>
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                         <span>Movie & Stream Library</span>
-                        <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-semibold border border-purple-500/30">
+                        <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-500/20 text-slate-300 font-semibold border border-slate-500/30">
                             {movies.length} Titles
                         </span>
                     </h2>
@@ -294,12 +294,12 @@ export default function MoviesTab() {
                         }}
                         className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all shadow-lg border text-sm ${
                             showSyncPanel
-                                ? 'bg-purple-600 text-white border-purple-400 shadow-purple-600/30'
-                                : 'bg-purple-950/60 hover:bg-purple-900/80 text-purple-200 border-purple-500/40 hover:border-purple-400'
+                                ? 'bg-slate-600 text-white border-slate-400 shadow-slate-600/30'
+                                : 'bg-slate-950/60 hover:bg-slate-900/80 text-slate-200 border-slate-500/40 hover:border-slate-400'
                         }`}
                         title="Auto-pull movies & series from TMDB between 2023-2026"
                     >
-                        <Zap size={18} className={showSyncPanel ? 'text-white' : 'text-purple-400 fill-purple-400/20'} />
+                        <Zap size={18} className={showSyncPanel ? 'text-white' : 'text-slate-400 fill-slate-400/20'} />
                         <span>Auto-Sync TMDB</span>
                     </button>
 
@@ -311,7 +311,7 @@ export default function MoviesTab() {
                             setShowAddForm(true);
                             if (showSyncPanel) setShowSyncPanel(false);
                         }}
-                        className="flex items-center gap-2 bg-gradient-to-r from-brand-purple to-brand-pink text-white px-5 py-2.5 rounded-xl font-bold hover:opacity-90 transition-all shadow-lg shadow-purple-500/25 text-sm"
+                        className="flex items-center gap-2 bg-gradient-to-r from-brand-accent to-brand-secondary text-white px-5 py-2.5 rounded-xl font-bold hover:opacity-90 transition-all shadow-lg shadow-slate-500/25 text-sm"
                     >
                         <Plus size={18} />
                         Add Manually
@@ -328,12 +328,12 @@ export default function MoviesTab() {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden mb-8"
                     >
-                        <div className="bg-gradient-to-br from-purple-950/40 via-zinc-900/90 to-black border border-purple-500/30 rounded-2xl p-6 backdrop-blur-xl shadow-2xl space-y-6">
+                        <div className="bg-gradient-to-br from-slate-950/40 via-zinc-900/90 to-black border border-slate-500/30 rounded-2xl p-6 backdrop-blur-xl shadow-2xl space-y-6">
                             {/* Panel Header */}
                             <div className="flex justify-between items-start">
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2">
-                                        <span className="p-1.5 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                        <span className="p-1.5 rounded-lg bg-slate-500/20 text-slate-300 border border-slate-500/30">
                                             <Zap size={18} />
                                         </span>
                                         <h3 className="text-xl font-bold text-white">TMDB Auto-Pull & Discovery Engine</h3>
@@ -359,21 +359,21 @@ export default function MoviesTab() {
                                         <button
                                             type="button"
                                             onClick={() => setSyncType('both')}
-                                            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${syncType === 'both' ? 'bg-purple-600 text-white shadow' : 'text-zinc-400 hover:text-white'}`}
+                                            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${syncType === 'both' ? 'bg-slate-600 text-white shadow' : 'text-zinc-400 hover:text-white'}`}
                                         >
                                             Both
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => setSyncType('movies')}
-                                            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${syncType === 'movies' ? 'bg-purple-600 text-white shadow' : 'text-zinc-400 hover:text-white'}`}
+                                            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${syncType === 'movies' ? 'bg-slate-600 text-white shadow' : 'text-zinc-400 hover:text-white'}`}
                                         >
                                             Movies
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => setSyncType('tv')}
-                                            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${syncType === 'tv' ? 'bg-purple-600 text-white shadow' : 'text-zinc-400 hover:text-white'}`}
+                                            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${syncType === 'tv' ? 'bg-slate-600 text-white shadow' : 'text-zinc-400 hover:text-white'}`}
                                         >
                                             Series
                                         </button>
@@ -391,7 +391,7 @@ export default function MoviesTab() {
                                                 max="2030"
                                                 value={syncStartYear}
                                                 onChange={e => setSyncStartYear(e.target.value)}
-                                                className="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-white text-xs font-mono focus:border-purple-500 focus:outline-none"
+                                                className="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-white text-xs font-mono focus:border-slate-500 focus:outline-none"
                                                 placeholder="2023"
                                             />
                                             <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-zinc-500 uppercase">From</span>
@@ -404,7 +404,7 @@ export default function MoviesTab() {
                                                 max="2030"
                                                 value={syncEndYear}
                                                 onChange={e => setSyncEndYear(e.target.value)}
-                                                className="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-white text-xs font-mono focus:border-purple-500 focus:outline-none"
+                                                className="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-white text-xs font-mono focus:border-slate-500 focus:outline-none"
                                                 placeholder="2026"
                                             />
                                             <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-zinc-500 uppercase">To</span>
@@ -418,7 +418,7 @@ export default function MoviesTab() {
                                     <select
                                         value={syncPages}
                                         onChange={e => setSyncPages(parseInt(e.target.value, 10))}
-                                        className="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-white text-xs focus:border-purple-500 focus:outline-none"
+                                        className="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-white text-xs focus:border-slate-500 focus:outline-none"
                                     >
                                         <option value={2}>Quick Pull (~40 titles)</option>
                                         <option value={5}>Standard Pull (~100 titles)</option>
@@ -431,7 +431,7 @@ export default function MoviesTab() {
                             {/* Action Button & Daemon Note */}
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-white/10">
                                 <div className="flex items-center gap-2 text-xs text-zinc-400">
-                                    <Zap size={14} className="text-purple-400 shrink-0" />
+                                    <Zap size={14} className="text-slate-400 shrink-0" />
                                     <span>
                                         Deduplication active: Already-saved TMDB titles will be skipped automatically.
                                     </span>
@@ -441,7 +441,7 @@ export default function MoviesTab() {
                                     type="button"
                                     onClick={handleRunAutoSync}
                                     disabled={isSyncing}
-                                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-purple-600/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-slate-600 to-slate-600 hover:from-slate-500 hover:to-slate-500 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-slate-600/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
                                 >
                                     {isSyncing ? (
                                         <>
@@ -521,9 +521,9 @@ export default function MoviesTab() {
                             {/* 12-Hour Automation Tip */}
                             <div className="p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between text-xs text-zinc-400">
                                 <div className="flex items-center gap-2">
-                                    <Clock size={14} className="text-purple-400" />
+                                    <Clock size={14} className="text-slate-400" />
                                     <span>
-                                        <strong>12-Hour Automation:</strong> Run <code className="bg-black/60 px-1.5 py-0.5 rounded text-purple-300 font-mono">npm run sync:tmdb:watch</code> in your terminal to continuously pull new titles every 12 hours.
+                                        <strong>12-Hour Automation:</strong> Run <code className="bg-black/60 px-1.5 py-0.5 rounded text-slate-300 font-mono">npm run sync:tmdb:watch</code> in your terminal to continuously pull new titles every 12 hours.
                                     </span>
                                 </div>
                             </div>
@@ -626,7 +626,7 @@ export default function MoviesTab() {
                                                 <span className="flex items-center gap-1"><Calendar size={10} /> {fetchedResult.year}</span>
                                                 <span className="flex items-center gap-1"><Star size={10} /> {fetchedResult.rating}/10</span>
                                                 {fetchedResult.numberOfSeasons && (
-                                                    <span className="text-purple-400 font-semibold">{fetchedResult.numberOfSeasons} Seasons ({fetchedResult.numberOfEpisodes || '?'} eps)</span>
+                                                    <span className="text-slate-400 font-semibold">{fetchedResult.numberOfSeasons} Seasons ({fetchedResult.numberOfEpisodes || '?'} eps)</span>
                                                 )}
                                                 {fetchedResult.runtime && (
                                                     <span className="flex items-center gap-1"><Clock size={10} /> {fetchedResult.runtime}m</span>
@@ -664,7 +664,7 @@ export default function MoviesTab() {
                                                 value={formData.title}
                                                 onChange={e => setFormData({ ...formData, title: e.target.value })}
                                                 placeholder="Movie title"
-                                                className="w-full bg-black/30 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-white text-sm focus:outline-none focus:border-brand-purple/50"
+                                                className="w-full bg-black/30 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-white text-sm focus:outline-none focus:border-brand-accent/50"
                                                 required
                                             />
                                         </div>
@@ -679,7 +679,7 @@ export default function MoviesTab() {
                                                 type="number"
                                                 value={formData.year}
                                                 onChange={e => setFormData({ ...formData, year: parseInt(e.target.value) || new Date().getFullYear() })}
-                                                className="w-full bg-black/30 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-white text-sm focus:outline-none focus:border-brand-purple/50"
+                                                className="w-full bg-black/30 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-white text-sm focus:outline-none focus:border-brand-accent/50"
                                                 required
                                             />
                                         </div>
@@ -697,11 +697,11 @@ export default function MoviesTab() {
                                                 placeholder="https://... or auto-filled from TMDB"
                                                 value={formData.posterUrl}
                                                 onChange={e => setFormData({ ...formData, posterUrl: e.target.value })}
-                                                className="w-full bg-black/30 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-white text-sm focus:outline-none focus:border-brand-purple/50"
+                                                className="w-full bg-black/30 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-white text-sm focus:outline-none focus:border-brand-accent/50"
                                                 required
                                             />
                                         </div>
-                                        <label className={`cursor-pointer ${uploadingPoster ? 'bg-brand-purple' : 'bg-white/5 hover:bg-white/10'} text-white px-4 rounded-xl border border-white/10 flex items-center justify-center transition-colors min-w-[90px] text-xs font-semibold`}>
+                                        <label className={`cursor-pointer ${uploadingPoster ? 'bg-brand-accent' : 'bg-white/5 hover:bg-white/10'} text-white px-4 rounded-xl border border-white/10 flex items-center justify-center transition-colors min-w-[90px] text-xs font-semibold`}>
                                             {uploadingPoster ? <><Loader className="animate-spin mr-1" size={14} />Uploading</> : formData.posterUrl ? <><Check className="mr-1 text-green-500" size={14} />Uploaded</> : <><Upload size={14} className="mr-1" />Upload</>}
                                             <input type="file" className="hidden" accept="image/*" disabled={uploadingPoster} onChange={async e => {
                                                 const file = e.target.files?.[0];
@@ -715,8 +715,8 @@ export default function MoviesTab() {
                                 </div>
 
                                 {/* ── Bingr Embed Builder ─────────────────────── */}
-                                <div className="p-4 bg-purple-950/30 border border-purple-500/20 rounded-2xl space-y-3">
-                                    <div className="flex items-center gap-2 text-purple-300 text-xs font-bold uppercase tracking-wider">
+                                <div className="p-4 bg-slate-950/30 border border-slate-500/20 rounded-2xl space-y-3">
+                                    <div className="flex items-center gap-2 text-slate-300 text-xs font-bold uppercase tracking-wider">
                                         <PlayCircle size={14} />
                                         Bingr Embed Builder
                                         <span className="ml-auto text-zinc-500 font-normal normal-case">For series, anime, or custom season/episode</span>
@@ -724,21 +724,21 @@ export default function MoviesTab() {
                                     <div className="flex flex-wrap gap-2 items-center">
                                         {(['movie', 'tv', 'anime', 'anime-mal'] as const).map(t => (
                                             <button key={t} type="button" onClick={() => setBingrType(t)}
-                                                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${bingrType === t ? 'bg-purple-600 text-white' : 'bg-black/40 text-zinc-400'}`}>
+                                                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${bingrType === t ? 'bg-slate-600 text-white' : 'bg-black/40 text-zinc-400'}`}>
                                                 {t === 'movie' ? 'Movie' : t === 'tv' ? 'Series' : t === 'anime' ? 'Anime (AniList)' : 'Anime (MAL)'}
                                             </button>
                                         ))}
                                     </div>
                                     <div className="flex flex-wrap gap-2 items-center">
                                         <input type="text" placeholder={bingrType.startsWith('anime') ? 'AniList / MAL ID' : 'TMDB ID'} value={tmdbFetchId} onChange={e => setTmdbFetchId(e.target.value)}
-                                            className="bg-black/50 border border-purple-500/30 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none flex-1 min-w-[120px]" />
+                                            className="bg-black/50 border border-slate-500/30 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none flex-1 min-w-[120px]" />
                                         {bingrType !== 'movie' && (
                                             <>
-                                                {bingrType === 'tv' && <input type="text" placeholder="Season" value={season} onChange={e => setSeason(e.target.value)} className="bg-black/50 border border-purple-500/30 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none w-20" />}
-                                                <input type="text" placeholder="Episode" value={episode} onChange={e => setEpisode(e.target.value)} className="bg-black/50 border border-purple-500/30 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none w-20" />
+                                                {bingrType === 'tv' && <input type="text" placeholder="Season" value={season} onChange={e => setSeason(e.target.value)} className="bg-black/50 border border-slate-500/30 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none w-20" />}
+                                                <input type="text" placeholder="Episode" value={episode} onChange={e => setEpisode(e.target.value)} className="bg-black/50 border border-slate-500/30 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none w-20" />
                                             </>
                                         )}
-                                        <button type="button" onClick={applyBingrPattern} className="px-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl transition-colors">
+                                        <button type="button" onClick={applyBingrPattern} className="px-4 py-1.5 bg-slate-600 hover:bg-slate-500 text-white text-xs font-bold rounded-xl transition-colors">
                                             Apply to Video URL
                                         </button>
                                     </div>
@@ -759,11 +759,11 @@ export default function MoviesTab() {
                                                     const parsed = parseEmbedUrl(raw);
                                                     setFormData({ ...formData, videoUrl: parsed.embedUrl || raw });
                                                 }}
-                                                className="w-full bg-black/30 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-white text-sm font-mono focus:outline-none focus:border-brand-purple/50"
+                                                className="w-full bg-black/30 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-white text-sm font-mono focus:outline-none focus:border-brand-accent/50"
                                                 required
                                             />
                                         </div>
-                                        <label className={`cursor-pointer ${uploadingVideo ? 'bg-brand-purple' : 'bg-white/5 hover:bg-white/10'} text-white px-4 rounded-xl border border-white/10 flex items-center justify-center transition-colors min-w-[90px] text-xs font-semibold`}>
+                                        <label className={`cursor-pointer ${uploadingVideo ? 'bg-brand-accent' : 'bg-white/5 hover:bg-white/10'} text-white px-4 rounded-xl border border-white/10 flex items-center justify-center transition-colors min-w-[90px] text-xs font-semibold`}>
                                             {uploadingVideo ? <><Loader className="animate-spin mr-1" size={14} />Uploading</> : <><Upload size={14} className="mr-1" />Upload</>}
                                             <input type="file" className="hidden" accept="video/*" disabled={uploadingVideo} onChange={async e => {
                                                 const file = e.target.files?.[0];
@@ -774,7 +774,7 @@ export default function MoviesTab() {
                                     {formData.videoUrl && (
                                         <div className="flex items-center justify-between p-2.5 bg-black/30 rounded-xl border border-white/10">
                                             <p className="text-xs text-green-400 font-mono truncate flex-1 mr-3">{parsedEmbed.embedUrl}</p>
-                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase whitespace-nowrap ${parsedEmbed.isBingr ? 'bg-purple-900/60 text-purple-300 border border-purple-500/30' : parsedEmbed.isIframe ? 'bg-blue-900/60 text-blue-300' : 'bg-emerald-900/60 text-emerald-300'}`}>
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase whitespace-nowrap ${parsedEmbed.isBingr ? 'bg-slate-900/60 text-slate-300 border border-slate-500/30' : parsedEmbed.isIframe ? 'bg-blue-900/60 text-blue-300' : 'bg-emerald-900/60 text-emerald-300'}`}>
                                                 {parsedEmbed.isBingr ? '🎬 Bingr' : parsedEmbed.isIframe ? '📺 iFrame' : '🎞 Direct'}
                                             </span>
                                         </div>
@@ -786,7 +786,7 @@ export default function MoviesTab() {
                                     <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">Genre (comma separated)</label>
                                     <input type="text" placeholder="Action, Sci-Fi, Drama" value={formData.genre}
                                         onChange={e => setFormData({ ...formData, genre: e.target.value })}
-                                        className="w-full bg-black/30 border border-white/10 rounded-xl py-2.5 px-4 text-white text-sm focus:outline-none focus:border-brand-purple/50" required />
+                                        className="w-full bg-black/30 border border-white/10 rounded-xl py-2.5 px-4 text-white text-sm focus:outline-none focus:border-brand-accent/50" required />
                                 </div>
 
                                 {/* Description */}
@@ -794,14 +794,14 @@ export default function MoviesTab() {
                                     <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">Description / Synopsis</label>
                                     <textarea value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })}
                                         placeholder="Auto-filled from TMDB or enter manually"
-                                        className="w-full bg-black/30 border border-white/10 rounded-xl py-2.5 px-4 text-white text-sm focus:outline-none focus:border-brand-purple/50 min-h-[90px] resize-none" required />
+                                        className="w-full bg-black/30 border border-white/10 rounded-xl py-2.5 px-4 text-white text-sm focus:outline-none focus:border-brand-accent/50 min-h-[90px] resize-none" required />
                                 </div>
 
                                 {/* Featured */}
                                 <div className="flex items-center gap-3">
                                     <input type="checkbox" id="featured" checked={formData.featured}
                                         onChange={e => setFormData({ ...formData, featured: e.target.checked })}
-                                        className="w-5 h-5 rounded accent-purple-500" />
+                                        className="w-5 h-5 rounded accent-slate-500" />
                                     <label htmlFor="featured" className="text-white text-sm font-medium cursor-pointer">
                                         Feature on homepage hero
                                     </label>
@@ -814,7 +814,7 @@ export default function MoviesTab() {
                                         Cancel
                                     </button>
                                     <button type="submit" disabled={uploadingPoster || uploadingVideo}
-                                        className="flex-1 bg-gradient-to-r from-brand-purple to-brand-pink text-white py-3 rounded-xl font-bold hover:opacity-90 transition-all disabled:opacity-50 text-sm">
+                                        className="flex-1 bg-gradient-to-r from-brand-accent to-brand-secondary text-white py-3 rounded-xl font-bold hover:opacity-90 transition-all disabled:opacity-50 text-sm">
                                         {editingMovie ? 'Update Movie' : 'Add Movie'}
                                     </button>
                                 </div>
@@ -827,7 +827,7 @@ export default function MoviesTab() {
             {/* ── Movies Grid ───────────────────────────────────────────── */}
             {isLoading ? (
                 <div className="text-center py-16">
-                    <Loader className="animate-spin text-brand-purple mx-auto" size={40} />
+                    <Loader className="animate-spin text-brand-accent mx-auto" size={40} />
                 </div>
             ) : movies.length === 0 ? (
                 <div className="text-center py-16 text-zinc-500">
@@ -840,12 +840,12 @@ export default function MoviesTab() {
                         const parsed = parseEmbedUrl(movie.videoUrl);
                         return (
                             <div key={movie._id as unknown as string}
-                                className="bg-zinc-900/50 border border-white/10 rounded-2xl overflow-hidden hover:border-brand-purple/50 transition-all group">
+                                className="bg-zinc-900/50 border border-white/10 rounded-2xl overflow-hidden hover:border-brand-accent/50 transition-all group">
                                 <div className="relative">
                                     <img src={movie.posterUrl} alt={movie.title} className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                                     {parsed.isBingr && (
-                                        <span className="absolute top-3 left-3 bg-purple-900/80 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-purple-500/40 text-[10px] font-bold text-purple-200">
+                                        <span className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-slate-500/40 text-[10px] font-bold text-slate-200">
                                             🎬 Bingr
                                         </span>
                                     )}
@@ -862,7 +862,7 @@ export default function MoviesTab() {
                                         <span className="text-xs text-zinc-500">{movie.year}</span>
                                         <div className="flex gap-2">
                                             <button onClick={() => handleEdit(movie)}
-                                                className="p-2 bg-white/5 hover:bg-brand-purple/20 text-brand-purple rounded-lg transition-colors">
+                                                className="p-2 bg-white/5 hover:bg-brand-accent/20 text-brand-accent rounded-lg transition-colors">
                                                 <Edit2 size={15} />
                                             </button>
                                             <button onClick={() => handleDelete(movie._id as unknown as string)}

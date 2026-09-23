@@ -1,156 +1,65 @@
-// AJStreams Service Worker - v1
-// Provides offline support and asset caching for PWA
+// Only public assets are cached. Sessions, account data, API responses,
+// and Next.js server-component payloads always stay on the network.
+const STATIC_CACHE = 'ajstreams-static-v2';
+const OFFLINE_URL = '/offline.html';
+const APP_SHELL = [OFFLINE_URL, '/manifest.json', '/logo.png', '/icons/icon-192x192.png', '/icons/icon-512x512.png'];
 
-const CACHE_NAME = 'ajstreams-v1';
-const STATIC_CACHE = 'ajstreams-static-v1';
-const API_CACHE = 'ajstreams-api-v1';
-
-// Core app shell assets to cache immediately
-const APP_SHELL = [
-  '/',
-  '/manifest.json',
-  '/logo.png',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
-];
-
-// ─── Install ────────────────────────────────────────────────────────────────
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => {
-      return cache.addAll(APP_SHELL).catch((err) => {
-        console.warn('[SW] Failed to cache some shell assets:', err);
-      });
-    })
-  );
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(STATIC_CACHE).then(cache => cache.addAll(APP_SHELL)));
   self.skipWaiting();
 });
 
-// ─── Activate ───────────────────────────────────────────────────────────────
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) =>
-      Promise.all(
-        cacheNames
-          .filter((name) => name !== STATIC_CACHE && name !== API_CACHE)
-          .map((name) => caches.delete(name))
-      )
-    )
-  );
-  self.clients.claim();
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const names = await caches.keys();
+    await Promise.all(names.filter(name => name.startsWith('ajstreams-') && name !== STATIC_CACHE).map(name => caches.delete(name)));
+    await self.clients.claim();
+  })());
 });
 
-// ─── Fetch Strategy ─────────────────────────────────────────────────────────
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
+  if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith('/api/') || request.headers.get('RSC') === '1') return;
 
-  // Skip non-GET, cross-origin iframes (Bingr, VidLink), and chrome-extension
-  if (request.method !== 'GET') return;
-  if (url.protocol === 'chrome-extension:') return;
-  if (
-    url.hostname.includes('bingr.one') ||
-    url.hostname.includes('vidlink.pro') ||
-    url.hostname.includes('multiembed.mov') ||
-    url.hostname.includes('tmdb.org') && url.pathname.includes('/t/p/')
-  ) return;
-
-  // API routes: network-first, fallback to cache
-  if (url.pathname.startsWith('/api/')) {
-    event.respondWith(networkFirstWithCache(request, API_CACHE, 60 * 60)); // 1hr TTL
-    return;
-  }
-
-  // Static assets (_next/static): cache-first
-  if (url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/icons/')) {
-    event.respondWith(cacheFirst(request, STATIC_CACHE));
-    return;
-  }
-
-  // Page navigation: network-first
   if (request.mode === 'navigate') {
-    event.respondWith(networkFirstWithOfflineFallback(request));
+    event.respondWith((async () => {
+      try { return await fetch(request); }
+      catch {
+        const cached = await caches.match(OFFLINE_URL);
+        return cached || new Response('You are offline. Reconnect to use AJStreams.', { status: 503, headers: { 'Content-Type': 'text/plain' } });
+      }
+    })());
     return;
   }
 
-  // Everything else: stale-while-revalidate
-  event.respondWith(staleWhileRevalidate(request, STATIC_CACHE));
+  const isPublicAsset = url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/icons/') || APP_SHELL.includes(url.pathname);
+  if (!isPublicAsset) return;
+  event.respondWith((async () => {
+    const cache = await caches.open(STATIC_CACHE);
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    try {
+      const response = await fetch(request);
+      if (response.ok) {
+        try { await cache.put(request, response.clone()); } catch { /* Full storage must not block loading. */ }
+      }
+      return response;
+    } catch { return Response.error(); }
+  })());
 });
 
-// ─── Strategies ─────────────────────────────────────────────────────────────
-
-async function cacheFirst(request, cacheName) {
-  const cached = await caches.match(request);
-  if (cached) return cached;
-  const response = await fetch(request);
-  if (response.ok) {
-    const cache = await caches.open(cacheName);
-    cache.put(request, response.clone());
-  }
-  return response;
-}
-
-async function networkFirstWithCache(request, cacheName, maxAgeSecs) {
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch {
-    const cached = await caches.match(request);
-    if (cached) return cached;
-    return new Response(JSON.stringify({ error: 'Offline', cached: false }), {
-      status: 503,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-}
-
-async function networkFirstWithOfflineFallback(request) {
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(STATIC_CACHE);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch {
-    const cached = await caches.match(request);
-    if (cached) return cached;
-    // Return cached root for offline
-    const root = await caches.match('/');
-    return root || new Response('<h1>You are offline</h1><p>AJStreams needs an internet connection to stream content.</p>', {
-      headers: { 'Content-Type': 'text/html' },
-    });
-  }
-}
-
-async function staleWhileRevalidate(request, cacheName) {
-  const cache = await caches.open(cacheName);
-  const cached = await cache.match(request);
-  const fetchPromise = fetch(request).then((response) => {
-    if (response.ok) cache.put(request, response.clone());
-    return response;
-  }).catch(() => cached);
-  return cached || fetchPromise;
-}
-
-// ─── Push Notifications (future use) ────────────────────────────────────────
-self.addEventListener('push', (event) => {
+self.addEventListener('push', event => {
   const data = event.data?.json() || {};
-  event.waitUntil(
-    self.registration.showNotification(data.title || 'AJStreams', {
-      body: data.body || 'New content available!',
-      icon: '/icons/icon-192x192.png',
-      badge: '/icons/icon-72x72.png',
-      data: { url: data.url || '/' },
-    })
-  );
+  event.waitUntil(self.registration.showNotification(data.title || 'AJStreams', {
+    body: data.body || 'New content available!', icon: '/icons/icon-192x192.png',
+    badge: '/icons/icon-72x72.png', data: { url: data.url || '/' },
+  }));
 });
 
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener('notificationclick', event => {
   event.notification.close();
-  event.waitUntil(clients.openWindow(event.notification.data?.url || '/'));
+  const target = new URL(event.notification.data?.url || '/', self.location.origin);
+  event.waitUntil(self.clients.openWindow(target.origin === self.location.origin ? target.href : '/'));
 });

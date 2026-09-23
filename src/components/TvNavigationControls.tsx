@@ -42,7 +42,7 @@ export default function TvNavigationControls({
 
             {/* Current Episode badge */}
             <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-xl">
-                <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold tracking-wider uppercase border border-purple-500/30">
+                <span className="px-1.5 py-0.5 rounded bg-slate-500/20 text-slate-300 text-[10px] font-bold tracking-wider uppercase border border-slate-500/30">
                     S{currentSeason} : E{currentEpisode}
                 </span>
                 {episodeTitle && (
@@ -73,7 +73,7 @@ export default function TvNavigationControls({
                 onClick={onToggleSidebar}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                     isSidebarOpen
-                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+                        ? 'bg-slate-600 text-white shadow-lg shadow-slate-600/30'
                         : 'bg-white/10 hover:bg-white/15 text-white'
                 }`}
                 title="View all episodes"

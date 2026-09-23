@@ -52,7 +52,7 @@ export default function WatchPartiesPage() {
 
     useEffect(() => {
         if (status === 'unauthenticated') {
-            router.push('/?login=true');
+            router.push('/account');
         } else if (status === 'authenticated') {
             fetchParties();
         }
@@ -65,7 +65,7 @@ export default function WatchPartiesPage() {
 
     if (status === 'loading' || isLoading) {
         return (
-            <div className="min-h-screen pt-24 px-4 md:px-8 max-w-7xl mx-auto">
+            <div className="library-page max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                     <div>
                         <div className="h-8 w-48 bg-zinc-800 rounded animate-pulse mb-2" />
@@ -87,11 +87,11 @@ export default function WatchPartiesPage() {
     }
 
     return (
-        <div className="min-h-screen pt-24 px-4 md:px-8 max-w-7xl mx-auto">
+        <div className="library-page max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-2">Live Watch Parties</h1>
-                    <p className="text-zinc-400">Join others and watch movies together in real-time.</p>
+                    <h1 className="text-3xl font-bold text-white mb-2">Better together.</h1>
+                    <p className="text-zinc-400">Your people. The same screen. Find a watch party and settle in.</p>
                 </div>
 
                 {/* Search Bar */}
@@ -102,7 +102,7 @@ export default function WatchPartiesPage() {
                         placeholder="Search parties or movies..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-zinc-900/50 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-brand-purple/50 transition-all"
+                        className="w-full bg-zinc-900/50 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-brand-accent/50 transition-all"
                     />
                 </div>
             </div>
@@ -120,7 +120,7 @@ export default function WatchPartiesPage() {
                             key={party._id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-zinc-900/50 border border-white/10 rounded-2xl overflow-hidden hover:border-brand-purple/50 transition-all group"
+                            className="bg-zinc-900/50 border border-white/10 rounded-2xl overflow-hidden hover:border-brand-accent/50 transition-all group"
                         >
                             <div className="p-6">
                                 <div className="flex justify-between items-start mb-4">
@@ -140,12 +140,12 @@ export default function WatchPartiesPage() {
                                 </div>
 
                                 <h3 className="text-xl font-bold text-white mb-1 truncate">{party.partyName || 'Untitled Party'}</h3>
-                                <p className="text-brand-purple text-sm font-medium mb-4 truncate">
+                                <p className="text-brand-accent text-sm font-medium mb-4 truncate">
                                     Watching: <span className="text-white">{party.movieTitle || 'Unknown Movie'}</span>
                                 </p>
 
                                 <div className="flex items-center gap-3 mb-6">
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-purple to-brand-pink flex items-center justify-center text-xs font-bold text-white">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-accent to-brand-secondary flex items-center justify-center text-xs font-bold text-white">
                                         {party.host?.name?.charAt(0).toUpperCase() || '?'}
                                     </div>
                                     <div className="text-sm">
@@ -156,7 +156,7 @@ export default function WatchPartiesPage() {
 
                                 <button
                                     onClick={() => router.push(`/watch-party/${party.shareCode}`)}
-                                    className="w-full bg-white/5 hover:bg-brand-purple text-white py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 group-hover:bg-brand-purple"
+                                    className="w-full bg-white/5 hover:bg-brand-accent text-white py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 group-hover:bg-brand-accent"
                                 >
                                     <Play size={18} fill="currentColor" />
                                     Join Party

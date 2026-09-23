@@ -72,13 +72,14 @@ export default function RequestMovieModal({
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm w-full max-w-md z-[101]"
+                        className="pwa-dialog-shell fixed inset-0 z-[101] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
                     >
-                        <div className="bg-zinc-900/90 border border-white/10 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl">
+                        <div role="dialog" aria-modal="true" aria-label="Request a movie" className="pwa-dialog-panel w-full max-w-md bg-zinc-900/90 border border-white/10 rounded-2xl shadow-2xl overflow-y-auto backdrop-blur-xl">
                             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
                                 <h2 className="text-xl font-bold text-white">Request a Movie</h2>
                                 <button
                                     onClick={onClose}
+                                    aria-label="Close request"
                                     className="text-zinc-400 hover:text-white transition-colors"
                                 >
                                     <X size={20} />
@@ -107,7 +108,7 @@ export default function RequestMovieModal({
                                             <div className="relative group">
                                                 <Film
                                                     size={18}
-                                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-brand-purple transition-colors"
+                                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-brand-accent transition-colors"
                                                 />
                                                 <input
                                                     type="text"
@@ -115,7 +116,7 @@ export default function RequestMovieModal({
                                                     onChange={(e) =>
                                                         setFormData({ ...formData, title: e.target.value })
                                                     }
-                                                    className="w-full bg-black/30 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/50 transition-all"
+                                                    className="w-full bg-black/30 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-brand-accent/50 focus:ring-1 focus:ring-brand-accent/50 transition-all"
                                                     placeholder="e.g. Inception"
                                                     required
                                                 />
@@ -129,7 +130,7 @@ export default function RequestMovieModal({
                                             <div className="relative group">
                                                 <User
                                                     size={18}
-                                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-brand-purple transition-colors"
+                                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-brand-accent transition-colors"
                                                 />
                                                 <input
                                                     type="text"
@@ -137,7 +138,7 @@ export default function RequestMovieModal({
                                                     onChange={(e) =>
                                                         setFormData({ ...formData, name: e.target.value })
                                                     }
-                                                    className="w-full bg-black/30 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/50 transition-all"
+                                                    className="w-full bg-black/30 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-brand-accent/50 focus:ring-1 focus:ring-brand-accent/50 transition-all"
                                                     placeholder="Your Name"
                                                     required
                                                 />
@@ -151,7 +152,7 @@ export default function RequestMovieModal({
                                             <div className="relative group">
                                                 <Mail
                                                     size={18}
-                                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-brand-purple transition-colors"
+                                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-brand-accent transition-colors"
                                                 />
                                                 <input
                                                     type="email"
@@ -159,7 +160,7 @@ export default function RequestMovieModal({
                                                     onChange={(e) =>
                                                         setFormData({ ...formData, email: e.target.value })
                                                     }
-                                                    className="w-full bg-black/30 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/50 transition-all"
+                                                    className="w-full bg-black/30 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-brand-accent/50 focus:ring-1 focus:ring-brand-accent/50 transition-all"
                                                     placeholder="your@email.com"
                                                     required
                                                 />
@@ -173,7 +174,7 @@ export default function RequestMovieModal({
                                             <div className="relative group">
                                                 <Calendar
                                                     size={18}
-                                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-brand-purple transition-colors"
+                                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-brand-accent transition-colors"
                                                 />
                                                 <input
                                                     type="number"
@@ -184,7 +185,7 @@ export default function RequestMovieModal({
                                                             releaseYear: e.target.value,
                                                         })
                                                     }
-                                                    className="w-full bg-black/30 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/50 transition-all"
+                                                    className="w-full bg-black/30 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-brand-accent/50 focus:ring-1 focus:ring-brand-accent/50 transition-all"
                                                     placeholder="e.g. 2010"
                                                 />
                                             </div>
@@ -199,7 +200,7 @@ export default function RequestMovieModal({
                                         <button
                                             type="submit"
                                             disabled={isLoading}
-                                            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-purple to-brand-pink text-white font-bold hover:opacity-90 transition-all transform active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-purple-500/25"
+                                            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-accent to-brand-secondary text-white font-bold hover:opacity-90 transition-all transform active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-slate-500/25"
                                         >
                                             {isLoading ? 'Submitting...' : 'Submit Request'}
                                         </button>
