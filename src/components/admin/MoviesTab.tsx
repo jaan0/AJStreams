@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import {
     Plus, Trash2, Edit2, Upload, X, Film, Calendar,
-    Link as LinkIcon, Check, Loader, PlayCircle, Search, Star, Clock
+    Link as LinkIcon, Check, Loader, PlayCircle, Search, Star, Clock,
+    Zap, RefreshCw, CheckCircle, Database, AlertCircle
 } from 'react-feather';
 import { IMovie } from '@/models/Movie';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -57,6 +58,49 @@ export default function MoviesTab() {
         year: new Date().getFullYear(),
         featured: false,
     });
+
+    // ─── TMDB Bulk Auto-Sync State ───────────────────────────────────────────
+    const [showSyncPanel, setShowSyncPanel] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
+    const [syncType, setSyncType] = useState<'both' | 'movies' | 'tv'>('both');
+    const [syncStartYear, setSyncStartYear] = useState('2023');
+    const [syncEndYear, setSyncEndYear] = useState('2026');
+    const [syncPages, setSyncPages] = useState(5);
+    const [syncResult, setSyncResult] = useState<any>(null);
+    const [syncError, setSyncError] = useState('');
+
+    const handleRunAutoSync = async () => {
+        setIsSyncing(true);
+        setSyncError('');
+        setSyncResult(null);
+
+        try {
+            const res = await fetch('/api/admin/tmdb-sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    types: syncType,
+                    startYear: parseInt(syncStartYear, 10) || 2023,
+                    endYear: parseInt(syncEndYear, 10) || 2026,
+                    maxPages: syncPages,
+                    minVoteCount: 15,
+                }),
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                setSyncError(data.message || 'Auto-sync failed');
+            } else {
+                setSyncResult(data);
+                // Refresh movies so new titles show up instantly
+                await fetchMovies();
+            }
+        } catch (err: any) {
+            setSyncError(err?.message || 'Network error occurred during sync');
+        } finally {
+            setIsSyncing(false);
+        }
+    };
 
     useEffect(() => {
         fetchMovies();
@@ -228,21 +272,265 @@ export default function MoviesTab() {
     return (
         <div>
             {/* Header */}
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <div>
-                    <h2 className="text-2xl font-bold text-white">Movie & Stream Library</h2>
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                        <span>Movie & Stream Library</span>
+                        <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-semibold border border-purple-500/30">
+                            {movies.length} Titles
+                        </span>
+                    </h2>
                     <p className="text-xs text-zinc-400 mt-1">
-                        Auto-fetch from TMDB · Accepts Bingr embeds, iframe snippets, or MP4 links
+                        Auto-pull from TMDB (2023–2026) · Bingr embeds · Duplicate-protected
                     </p>
                 </div>
-                <button
-                    onClick={() => { setEditingMovie(null); resetForm(); setShowAddForm(true); }}
-                    className="flex items-center gap-2 bg-gradient-to-r from-brand-purple to-brand-pink text-white px-6 py-2.5 rounded-xl font-bold hover:opacity-90 transition-all shadow-lg shadow-purple-500/25"
-                >
-                    <Plus size={20} />
-                    Add Movie
-                </button>
+                <div className="flex items-center gap-3">
+                    {/* Auto-Sync Trigger Button */}
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setShowSyncPanel(!showSyncPanel);
+                            if (showAddForm) setShowAddForm(false);
+                        }}
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all shadow-lg border text-sm ${
+                            showSyncPanel
+                                ? 'bg-purple-600 text-white border-purple-400 shadow-purple-600/30'
+                                : 'bg-purple-950/60 hover:bg-purple-900/80 text-purple-200 border-purple-500/40 hover:border-purple-400'
+                        }`}
+                        title="Auto-pull movies & series from TMDB between 2023-2026"
+                    >
+                        <Zap size={18} className={showSyncPanel ? 'text-white' : 'text-purple-400 fill-purple-400/20'} />
+                        <span>Auto-Sync TMDB</span>
+                    </button>
+
+                    {/* Manual Add Button */}
+                    <button
+                        onClick={() => {
+                            setEditingMovie(null);
+                            resetForm();
+                            setShowAddForm(true);
+                            if (showSyncPanel) setShowSyncPanel(false);
+                        }}
+                        className="flex items-center gap-2 bg-gradient-to-r from-brand-purple to-brand-pink text-white px-5 py-2.5 rounded-xl font-bold hover:opacity-90 transition-all shadow-lg shadow-purple-500/25 text-sm"
+                    >
+                        <Plus size={18} />
+                        Add Manually
+                    </button>
+                </div>
             </div>
+
+            {/* ── Auto-Sync TMDB Panel ────────────────────────────────────────── */}
+            <AnimatePresence>
+                {showSyncPanel && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden mb-8"
+                    >
+                        <div className="bg-gradient-to-br from-purple-950/40 via-zinc-900/90 to-black border border-purple-500/30 rounded-2xl p-6 backdrop-blur-xl shadow-2xl space-y-6">
+                            {/* Panel Header */}
+                            <div className="flex justify-between items-start">
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                        <span className="p-1.5 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                            <Zap size={18} />
+                                        </span>
+                                        <h3 className="text-xl font-bold text-white">TMDB Auto-Pull & Discovery Engine</h3>
+                                    </div>
+                                    <p className="text-xs text-zinc-400 max-w-2xl">
+                                        Searches TMDB for popular movies and TV series released in your selected years, skips any titles you already have in the database, and automatically generates Bingr/VidLink streaming embed links.
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => setShowSyncPanel(false)}
+                                    className="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-white/10"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            {/* Sync Controls Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                                {/* Type selector */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Content Type</label>
+                                    <div className="flex rounded-xl overflow-hidden border border-white/15 bg-black/40 p-1 gap-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => setSyncType('both')}
+                                            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${syncType === 'both' ? 'bg-purple-600 text-white shadow' : 'text-zinc-400 hover:text-white'}`}
+                                        >
+                                            Both
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setSyncType('movies')}
+                                            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${syncType === 'movies' ? 'bg-purple-600 text-white shadow' : 'text-zinc-400 hover:text-white'}`}
+                                        >
+                                            Movies
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setSyncType('tv')}
+                                            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${syncType === 'tv' ? 'bg-purple-600 text-white shadow' : 'text-zinc-400 hover:text-white'}`}
+                                        >
+                                            Series
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Year Range */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Release Year Window</label>
+                                    <div className="flex items-center gap-2">
+                                        <div className="relative flex-1">
+                                            <input
+                                                type="number"
+                                                min="2000"
+                                                max="2030"
+                                                value={syncStartYear}
+                                                onChange={e => setSyncStartYear(e.target.value)}
+                                                className="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-white text-xs font-mono focus:border-purple-500 focus:outline-none"
+                                                placeholder="2023"
+                                            />
+                                            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-zinc-500 uppercase">From</span>
+                                        </div>
+                                        <span className="text-zinc-500 text-xs font-bold">→</span>
+                                        <div className="relative flex-1">
+                                            <input
+                                                type="number"
+                                                min="2000"
+                                                max="2030"
+                                                value={syncEndYear}
+                                                onChange={e => setSyncEndYear(e.target.value)}
+                                                className="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-white text-xs font-mono focus:border-purple-500 focus:outline-none"
+                                                placeholder="2026"
+                                            />
+                                            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-zinc-500 uppercase">To</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Batch Volume */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Batch Pull Volume</label>
+                                    <select
+                                        value={syncPages}
+                                        onChange={e => setSyncPages(parseInt(e.target.value, 10))}
+                                        className="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-white text-xs focus:border-purple-500 focus:outline-none"
+                                    >
+                                        <option value={2}>Quick Pull (~40 titles)</option>
+                                        <option value={5}>Standard Pull (~100 titles)</option>
+                                        <option value={10}>Deep Pull (~200 titles)</option>
+                                        <option value={20}>Maximum Pull (~400 titles)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Action Button & Daemon Note */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-white/10">
+                                <div className="flex items-center gap-2 text-xs text-zinc-400">
+                                    <Zap size={14} className="text-purple-400 shrink-0" />
+                                    <span>
+                                        Deduplication active: Already-saved TMDB titles will be skipped automatically.
+                                    </span>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={handleRunAutoSync}
+                                    disabled={isSyncing}
+                                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-purple-600/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                >
+                                    {isSyncing ? (
+                                        <>
+                                            <Loader size={16} className="animate-spin text-white" />
+                                            <span>Pulling & Importing...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <RefreshCw size={16} />
+                                            <span>Start Auto-Pull ({syncStartYear}–{syncEndYear})</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+
+                            {/* Error Banner */}
+                            {syncError && (
+                                <div className="p-3 bg-red-950/40 border border-red-500/30 rounded-xl flex items-center gap-2.5 text-red-300 text-xs animate-in fade-in">
+                                    <AlertCircle size={16} className="shrink-0 text-red-400" />
+                                    <span>{syncError}</span>
+                                </div>
+                            )}
+
+                            {/* Success Banner */}
+                            {syncResult && (
+                                <div className="p-4 bg-emerald-950/40 border border-emerald-500/40 rounded-xl space-y-3 animate-in fade-in">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2 text-emerald-300 font-bold text-sm">
+                                            <CheckCircle size={18} className="text-emerald-400" />
+                                            <span>Sync Finished Successfully!</span>
+                                        </div>
+                                        <span className="text-[11px] text-zinc-400">
+                                            Completed in {((syncResult.durationMs || 0) / 1000).toFixed(1)}s
+                                        </span>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                                        <div className="bg-black/40 p-2 rounded-lg border border-white/5">
+                                            <p className="text-zinc-400 text-[10px] uppercase">Discovered</p>
+                                            <p className="text-base font-black text-white">{syncResult.totalDiscovered}</p>
+                                        </div>
+                                        <div className="bg-emerald-900/30 p-2 rounded-lg border border-emerald-500/20">
+                                            <p className="text-emerald-400 text-[10px] uppercase font-semibold">Added to Site</p>
+                                            <p className="text-base font-black text-emerald-300">+{syncResult.addedCount}</p>
+                                        </div>
+                                        <div className="bg-black/40 p-2 rounded-lg border border-white/5">
+                                            <p className="text-zinc-400 text-[10px] uppercase">Already in DB (Skipped)</p>
+                                            <p className="text-base font-black text-zinc-400">{syncResult.skippedCount}</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Sample of Added Titles */}
+                                    {syncResult.addedTitles && syncResult.addedTitles.length > 0 && (
+                                        <div className="space-y-1.5 pt-1">
+                                            <p className="text-[11px] font-semibold text-zinc-400">Sample of newly added titles:</p>
+                                            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                                                {syncResult.addedTitles.slice(0, 15).map((t: any, idx: number) => (
+                                                    <span
+                                                        key={idx}
+                                                        className="px-2 py-0.5 rounded-md bg-white/10 text-white text-[11px] flex items-center gap-1 border border-white/10"
+                                                    >
+                                                        <span>{t.type === 'tv' ? '📺' : '🎬'}</span>
+                                                        <span className="font-medium">{t.title}</span>
+                                                        <span className="text-zinc-400 text-[10px]">({t.year})</span>
+                                                    </span>
+                                                ))}
+                                                {syncResult.addedTitles.length > 15 && (
+                                                    <span className="text-[10px] text-zinc-400 px-1 py-0.5">
+                                                        +{syncResult.addedTitles.length - 15} more
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* 12-Hour Automation Tip */}
+                            <div className="p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between text-xs text-zinc-400">
+                                <div className="flex items-center gap-2">
+                                    <Clock size={14} className="text-purple-400" />
+                                    <span>
+                                        <strong>12-Hour Automation:</strong> Run <code className="bg-black/60 px-1.5 py-0.5 rounded text-purple-300 font-mono">npm run sync:tmdb:watch</code> in your terminal to continuously pull new titles every 12 hours.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Add / Edit Form */}
             <AnimatePresence>

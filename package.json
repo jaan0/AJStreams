@@ -6,7 +6,9 @@
     "dev": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096 --max-semi-space-size=64\" next dev",
     "build": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096 --max-semi-space-size=64\" next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sync:tmdb": "node scripts/sync-tmdb.mjs",
+    "sync:tmdb:watch": "node scripts/sync-tmdb.mjs --loop"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",
