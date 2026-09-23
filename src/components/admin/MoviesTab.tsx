@@ -23,6 +23,8 @@ interface TmdbResult {
     runtime: number | null;
     tagline: string;
     bingrMovieUrl: string;
+    numberOfSeasons?: number | null;
+    numberOfEpisodes?: number | null;
 }
 
 export default function MoviesTab() {
@@ -335,6 +337,9 @@ export default function MoviesTab() {
                                             <div className="flex flex-wrap gap-2 text-xs text-zinc-400">
                                                 <span className="flex items-center gap-1"><Calendar size={10} /> {fetchedResult.year}</span>
                                                 <span className="flex items-center gap-1"><Star size={10} /> {fetchedResult.rating}/10</span>
+                                                {fetchedResult.numberOfSeasons && (
+                                                    <span className="text-purple-400 font-semibold">{fetchedResult.numberOfSeasons} Seasons ({fetchedResult.numberOfEpisodes || '?'} eps)</span>
+                                                )}
                                                 {fetchedResult.runtime && (
                                                     <span className="flex items-center gap-1"><Clock size={10} /> {fetchedResult.runtime}m</span>
                                                 )}

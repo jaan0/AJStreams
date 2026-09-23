@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Hero from '@/components/Hero';
 import MovieSection from '@/components/MovieSection';
 import AIRecommendations from '@/components/AIRecommendations';
 import MovieDetailsModal from '@/components/MovieDetailsModal';
-import VideoPlayer from '@/components/VideoPlayer';
 import Footer from '@/components/Footer';
 import { IMovie } from '@/models/Movie';
+import { extractBingrTvParams } from '@/lib/embed';
 
 interface ClientHomeProps {
     featuredMovies: IMovie[];
@@ -20,11 +21,16 @@ export default function ClientHome({
     moviesByGenre,
     allMovies,
 }: ClientHomeProps) {
-    const [playingMovie, setPlayingMovie] = useState<IMovie | null>(null);
+    const router = useRouter();
     const [selectedMovie, setSelectedMovie] = useState<IMovie | null>(null);
 
     const handlePlay = (movie: IMovie) => {
-        setPlayingMovie(movie);
+        const tvParams = extractBingrTvParams(movie.videoUrl);
+        if (tvParams.isBingrTv && tvParams.tmdbId) {
+            router.push(`/watch/tv/${tvParams.tmdbId}/${tvParams.season || 1}/${tvParams.episode || 1}`);
+            return;
+        }
+        router.push(`/movie/${movie._id}`);
     };
 
     const handleMoreInfo = (movie: IMovie) => {
@@ -67,15 +73,6 @@ export default function ClientHome({
 
             {/* Footer */}
             <Footer />
-
-            {/* Video Player Modal */}
-            {playingMovie && (
-                <VideoPlayer
-                    videoUrl={playingMovie.videoUrl}
-                    title={playingMovie.title}
-                    onClose={() => setPlayingMovie(null)}
-                />
-            )}
 
             {/* Movie Details Modal */}
             {selectedMovie && (

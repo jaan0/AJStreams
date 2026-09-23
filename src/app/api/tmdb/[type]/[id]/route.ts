@@ -70,6 +70,18 @@ export async function GET(
             runtime: details.runtime || details.episode_run_time?.[0] || null,
             status: details.status || '',
             tagline: details.tagline || '',
+            numberOfSeasons: details.number_of_seasons || null,
+            numberOfEpisodes: details.number_of_episodes || null,
+            seasons: (details.seasons || [])
+                .filter((s: any) => s.season_number > 0)
+                .map((s: any) => ({
+                    id: s.id,
+                    name: s.name,
+                    seasonNumber: s.season_number,
+                    episodeCount: s.episode_count,
+                    posterUrl: s.poster_path ? `${TMDB_IMAGE}${s.poster_path}` : null,
+                    airDate: s.air_date,
+                })),
             // Bingr embed URL generated from TMDB ID
             bingrMovieUrl: endpoint === 'movie'
                 ? `https://bingr.one/watch/movie/${id}`

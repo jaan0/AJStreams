@@ -13,12 +13,20 @@ interface HeroProps {
 
 export default function Hero({ movies, onPlay, onMoreInfo }: HeroProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 768);
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+    }, []);
 
     useEffect(() => {
         if (movies.length > 1) {
             const timer = setTimeout(() => {
-                setCurrentIndex((prevIndex) => (prevIndex + 1) % movies.length);
-            }, 4000); // 4-second delay
+                setCurrentIndex((prev) => (prev + 1) % movies.length);
+            }, 5000);
             return () => clearTimeout(timer);
         }
     }, [currentIndex, movies.length]);
@@ -27,15 +35,10 @@ export default function Hero({ movies, onPlay, onMoreInfo }: HeroProps) {
 
     const currentMovie = movies[currentIndex];
 
-    const variants = {
-        initial: { opacity: 0, y: 30 },
-        animate: { opacity: 1, y: 0 },
-        exit: { opacity: 0, y: -30 },
-    };
-
     return (
-        <div className="relative h-[70vh] w-full overflow-hidden">
-            {/* Background Image */}
+        /* Use dvh so hero doesn't get cut off by mobile browser bars */
+        <div className="relative w-full overflow-hidden" style={{ height: isMobile ? '88svh' : '70vh' }}>
+            {/* Background Image with crossfade */}
             <AnimatePresence initial={false}>
                 <motion.div
                     key={currentIndex}
@@ -49,76 +52,94 @@ export default function Hero({ movies, onPlay, onMoreInfo }: HeroProps) {
                         src={currentMovie.posterUrl}
                         alt={currentMovie.title}
                         className="h-full w-full object-cover filter blur-2xl scale-110"
+                        loading="eager"
                     />
-                    <div className="absolute inset-0 bg-black/60" />
+                    {/* Stronger gradient on mobile so text is legible */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/30 md:bg-black/60 md:bg-none"
+                         style={{ background: isMobile
+                             ? 'linear-gradient(to top, #0a0a0a 0%, rgba(10,10,10,0.85) 40%, rgba(10,10,10,0.4) 100%)'
+                             : 'rgba(0,0,0,0.6)'
+                         }}
+                    />
                 </motion.div>
             </AnimatePresence>
 
             {/* Content */}
-            <div className="relative z-10 h-full flex flex-col justify-center">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-4 md:px-12">
+            <div className="relative z-10 h-full flex flex-col justify-end md:justify-center">
+                <div className="px-4 md:px-12 pb-12 md:pb-0 md:grid md:grid-cols-2 md:gap-8 md:items-center">
                     {/* Left Side: Movie Info */}
                     <motion.div
                         key={currentIndex}
-                        initial="initial"
-                        animate="animate"
-                        exit="exit"
-                        variants={variants}
-                        transition={{ duration: 0.8, ease: 'easeOut' }}
-                        className="max-w-2xl space-y-6 text-white"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.7, ease: 'easeOut' }}
+                        className="space-y-3 md:space-y-6 text-white"
                     >
-                        <div className="flex gap-2">
-                            {currentMovie.genre.slice(0, 3).map((g, i) => (
+                        {/* Genre badges */}
+                        <div className="flex flex-wrap gap-1.5">
+                            {currentMovie.genre.slice(0, 2).map((g, i) => (
                                 <span
                                     key={i}
-                                    className="px-2 py-1 md:px-3 md:py-1.5 rounded-full glass border border-white/20 text-[10px] md:text-xs font-bold uppercase tracking-wider"
+                                    className="px-2 py-1 rounded-full glass border border-white/20 text-[10px] md:text-xs font-bold uppercase tracking-wider"
                                 >
                                     {g}
                                 </span>
                             ))}
                         </div>
-                        <h1 className="text-3xl md:text-6xl font-black drop-shadow-2xl tracking-tight leading-tight">
+
+                        {/* Title */}
+                        <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black drop-shadow-2xl tracking-tight leading-tight">
                             {currentMovie.title}
                         </h1>
-                        <div className="flex items-center gap-4 text-zinc-300 text-sm font-medium">
-                            <span className="text-green-400 font-bold text-base">98% Match</span>
+
+                        {/* Meta info */}
+                        <div className="flex items-center gap-3 text-zinc-300 text-xs md:text-sm font-medium">
+                            <span className="text-green-400 font-bold text-sm md:text-base">98% Match</span>
                             <span>{currentMovie.year}</span>
-                            <span className="px-2 py-0.5 border border-zinc-500 rounded text-xs">HD</span>
+                            <span className="px-1.5 py-0.5 border border-zinc-500 rounded text-[10px]">HD</span>
                         </div>
-                        <p className="text-lg md:text-xl text-zinc-200 line-clamp-3 leading-relaxed drop-shadow-md max-w-xl">
+
+                        {/* Description — hidden on small mobile, shown on sm+ */}
+                        <p className="hidden sm:block text-sm md:text-lg text-zinc-200 line-clamp-2 md:line-clamp-3 leading-relaxed drop-shadow-md max-w-xl">
                             {currentMovie.description}
                         </p>
-                        <div className="flex items-center gap-4 pt-4">
+
+                        {/* Buttons */}
+                        <div className="flex items-center gap-3 pt-2 md:pt-4">
                             <button
                                 onClick={() => onPlay(currentMovie)}
-                                className="btn-primary flex items-center gap-3"
+                                className="flex items-center gap-2 px-5 py-3 md:px-8 md:py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-xl md:rounded-button text-sm md:text-base hover:scale-105 hover:shadow-glow transition-all duration-300 shadow-lg touch-btn"
                             >
-                                <Play fill="currentColor" size={24} />
-                                Play Now
+                                <Play fill="currentColor" size={18} />
+                                <span className="hidden xs:inline">Play Now</span>
+                                <span className="xs:hidden">Play</span>
                             </button>
                             <button
                                 onClick={() => onMoreInfo(currentMovie)}
-                                className="btn-secondary flex items-center gap-3"
+                                className="flex items-center gap-2 px-4 py-3 md:px-8 md:py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl md:rounded-button text-sm md:text-base border border-white/20 hover:scale-105 transition-all duration-300 touch-btn"
                             >
-                                <Info size={24} />
-                                More Info
+                                <Info size={18} />
+                                <span className="hidden xs:inline">More Info</span>
+                                <span className="xs:hidden">Info</span>
                             </button>
                         </div>
                     </motion.div>
 
-                    {/* Right Side: Poster (Visible on mobile now) */}
+                    {/* Right Side: Poster — only shown on md+ */}
                     <motion.div
                         key={currentIndex + '-poster'}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.8, ease: 'easeOut' }}
-                        className="flex justify-center items-center mt-8 md:mt-0 order-first md:order-last"
+                        className="hidden md:flex justify-center items-center"
                     >
-                        <div className="relative w-[200px] md:w-[300px] aspect-[2/3] rounded-lg overflow-hidden shadow-2xl">
+                        <div className="relative w-[240px] lg:w-[300px] aspect-[2/3] rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
                             <img
                                 src={currentMovie.posterUrl}
                                 alt={currentMovie.title}
-                                className="h-full w-full object-contain"
+                                className="h-full w-full object-cover"
+                                loading="eager"
                             />
                         </div>
                     </motion.div>
@@ -127,20 +148,23 @@ export default function Hero({ movies, onPlay, onMoreInfo }: HeroProps) {
 
             {/* Carousel Dots */}
             {movies.length > 1 && (
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+                <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
                     {movies.map((_, index) => (
                         <button
                             key={index}
                             onClick={() => setCurrentIndex(index)}
-                            className={`w-2 h-2 rounded-full transition-colors ${currentIndex === index ? 'bg-white' : 'bg-white/50'
-                                }`}
+                            className={`rounded-full transition-all ${
+                                currentIndex === index
+                                    ? 'bg-white w-6 h-2'
+                                    : 'bg-white/40 w-2 h-2 hover:bg-white/70'
+                            }`}
                         />
                     ))}
                 </div>
             )}
 
             {/* Bottom Fade */}
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-16 md:h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
         </div>
     );
 }

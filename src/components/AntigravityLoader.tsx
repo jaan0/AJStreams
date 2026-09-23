@@ -36,6 +36,7 @@ const AJStreamsLoader = () => {
                         src="/logo.png"
                         alt="AJStreams"
                         fill
+                        sizes="128px"
                         className="object-contain drop-shadow-2xl"
                         priority
                     />

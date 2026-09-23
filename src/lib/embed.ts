@@ -90,3 +90,124 @@ export function createBingrAnimeUrl(anilistId: string | number, episode: string 
 export function createBingrAnimeMalUrl(malId: string | number, episode: string | number): string {
     return `https://bingr.one/watch/anime/mal-${malId}/${episode}`;
 }
+
+export interface BingrTvParams {
+    isBingrTv: boolean;
+    tmdbId?: string;
+    season?: number;
+    episode?: number;
+}
+
+/**
+ * Extracts tmdbId, season, and episode numbers from any Bingr TV embed URL.
+ * Matches patterns like https://bingr.one/watch/tv/76479/1/1 or /watch/tv/76479/2/5
+ */
+export function extractBingrTvParams(input: string): BingrTvParams {
+    if (!input) return { isBingrTv: false };
+    const clean = extractIframeSrc(input);
+    const match = clean.match(/watch\/tv\/([0-9a-zA-Z_-]+)\/(\d+)\/(\d+)/i);
+    if (match) {
+        return {
+            isBingrTv: true,
+            tmdbId: match[1],
+            season: parseInt(match[2], 10),
+            episode: parseInt(match[3], 10),
+        };
+    }
+    return { isBingrTv: false };
+}
+
+/**
+ * Builds a Bingr series episode embed URL.
+ */
+export function buildBingrTvUrl(
+    tmdbId: string | number,
+    season: string | number,
+    episode: string | number
+): string {
+    return `https://bingr.one/watch/tv/${tmdbId}/${season}/${episode}`;
+}
+
+export type StreamServer = 'bingr' | 'vidlink' | 'multiembed';
+
+export interface ServerOption {
+    id: StreamServer;
+    name: string;
+    badge: string;
+    icon: string;
+    tagline: string;
+}
+
+export const STREAM_SERVERS: ServerOption[] = [
+    {
+        id: 'bingr',
+        name: 'Bingr',
+        badge: '🎬 Default',
+        icon: '🎬',
+        tagline: 'Bingr Player',
+    },
+    {
+        id: 'vidlink',
+        name: 'VidLink',
+        badge: '⚡ Ad-Lite',
+        icon: '⚡',
+        tagline: 'Minimal ads & clean streaming',
+    },
+    {
+        id: 'multiembed',
+        name: 'MultiEmbed',
+        badge: '🍿 Multi',
+        icon: '🍿',
+        tagline: 'Multi-source stream provider',
+    },
+];
+
+/**
+ * Extracts a TMDB ID from any embed URL (Bingr, VidLink, MultiEmbed, or raw ID).
+ */
+export function extractTmdbId(input: string): string | null {
+    if (!input) return null;
+    const clean = extractIframeSrc(input);
+    if (/^\d+$/.test(clean.trim())) return clean.trim();
+    const movieMatch = clean.match(/watch\/movie\/(\d+)/i);
+    if (movieMatch) return movieMatch[1];
+    const tvMatch = clean.match(/watch\/tv\/(\d+)/i);
+    if (tvMatch) return tvMatch[1];
+    const vidlinkMatch = clean.match(/vidlink\.pro\/(?:movie|tv)\/(\d+)/i);
+    if (vidlinkMatch) return vidlinkMatch[1];
+    const multiMatch = clean.match(/video_id=(\d+)/i);
+    if (multiMatch) return multiMatch[1];
+    return null;
+}
+
+/**
+ * Generates stream embed URL for any chosen server (Bingr, VidLink, MultiEmbed)
+ */
+export function buildServerUrl(
+    server: StreamServer,
+    mediaType: 'movie' | 'tv',
+    tmdbId: string | number,
+    season: number = 1,
+    episode: number = 1
+): string {
+    const id = tmdbId.toString();
+
+    if (server === 'vidlink') {
+        return mediaType === 'tv'
+            ? `https://vidlink.pro/tv/${id}/${season}/${episode}`
+            : `https://vidlink.pro/movie/${id}`;
+    }
+
+    if (server === 'multiembed') {
+        return mediaType === 'tv'
+            ? `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`
+            : `https://multiembed.mov/?video_id=${id}&tmdb=1`;
+    }
+
+    // Default: Bingr
+    return mediaType === 'tv'
+        ? `https://bingr.one/watch/tv/${id}/${season}/${episode}`
+        : `https://bingr.one/watch/movie/${id}`;
+}
+
+

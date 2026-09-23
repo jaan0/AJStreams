@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { Search, User, LogOut, PlusCircle, Menu, X } from 'react-feather';
@@ -20,6 +20,17 @@ export default function Navbar() {
 
     const { scrollY } = useScroll();
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                setShowSearchModal((prev) => !prev);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
     useMotionValueEvent(scrollY, "change", (latest) => {
         setIsScrolled(latest > 50);
     });
@@ -27,18 +38,11 @@ export default function Navbar() {
     return (
         <>
             <motion.nav
-                className="fixed top-0 left-0 right-0 z-50 h-16 md:h-20 flex items-center"
-                initial={{
-                    backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.7), transparent)',
-                    backgroundColor: 'rgba(10, 10, 10, 0)',
-                } as any}
-                animate={{
-                    backgroundImage: isScrolled ? 'none' : 'linear-gradient(to bottom, rgba(0,0,0,0.7), transparent)',
-                    backgroundColor: isScrolled ? 'rgba(10, 10, 10, 0.8)' : 'rgba(10, 10, 10, 0)',
-                    backdropFilter: isScrolled ? 'blur(16px)' : 'blur(0px)',
-                    borderBottom: isScrolled ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0)',
-                } as any}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
+                className={`fixed top-0 left-0 right-0 z-50 h-16 md:h-20 flex items-center transition-all duration-300 ${
+                    isScrolled
+                        ? 'bg-[#0a0a0a]/85 backdrop-blur-md border-b border-white/10 shadow-lg shadow-black/30'
+                        : 'bg-gradient-to-b from-black/80 via-black/30 to-transparent border-b border-transparent'
+                }`}
             >
                 <div className="w-full px-4 md:px-12 flex items-center justify-between">
                     {/* Left Section */}
@@ -73,9 +77,23 @@ export default function Navbar() {
 
                     {/* Right Section */}
                     <div className="flex items-center gap-2 md:gap-4">
+                        {/* Modern Desktop Search Pill */}
                         <button
                             onClick={() => setShowSearchModal(true)}
-                            className="text-zinc-300 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
+                            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-500/40 text-zinc-400 hover:text-white transition-all text-xs shadow-inner"
+                            aria-label="Search library"
+                        >
+                            <Search size={14} className="text-purple-400" />
+                            <span className="text-zinc-500">Search titles, series...</span>
+                            <kbd className="px-1.5 py-0.5 rounded bg-black/60 border border-white/10 text-[10px] text-zinc-400 font-mono">
+                                ⌘K
+                            </kbd>
+                        </button>
+
+                        {/* Mobile Search Icon Button */}
+                        <button
+                            onClick={() => setShowSearchModal(true)}
+                            className="md:hidden text-zinc-300 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
                             aria-label="Search"
                         >
                             <Search size={20} />

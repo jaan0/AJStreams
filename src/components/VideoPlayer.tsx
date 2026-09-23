@@ -2,17 +2,25 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Channel } from 'pusher-js';
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, SkipBack, SkipForward, X } from 'react-feather';
+import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, SkipBack, SkipForward, X, ArrowLeft } from 'react-feather';
 import { toast } from 'react-hot-toast';
-import { parseEmbedUrl } from '@/lib/embed';
+import { parseEmbedUrl, extractTmdbId, extractBingrTvParams, buildServerUrl, StreamServer, STREAM_SERVERS } from '@/lib/embed';
+import ServerSelector from '@/components/ServerSelector';
 
 interface VideoPlayerProps {
     videoUrl: string;
     title: string;
-    onClose: () => void;
+    onClose?: () => void;
     channel?: Channel | null;
     partyId?: string;
     isHost?: boolean;
+    tvControls?: React.ReactNode;
+    mediaType?: 'movie' | 'tv';
+    tmdbId?: string;
+    season?: number;
+    episode?: number;
+    defaultServer?: StreamServer;
+    onServerChange?: (server: StreamServer) => void;
 }
 
 export default function VideoPlayer({
@@ -22,6 +30,13 @@ export default function VideoPlayer({
     channel,
     partyId,
     isHost = false,
+    tvControls,
+    mediaType,
+    tmdbId,
+    season,
+    episode,
+    defaultServer,
+    onServerChange,
 }: VideoPlayerProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -37,10 +52,110 @@ export default function VideoPlayer({
     const [isSyncing, setIsSyncing] = useState(false);
     const [buffering, setBuffering] = useState(false);
 
-    const hideControlsTimeout = useRef<NodeJS.Timeout>();
+    // Multi-server & Anti-Hijack state
+    const [server, setServer] = useState<StreamServer>(() => {
+        if (defaultServer) return defaultServer;
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('ajstreams_stream_server') as StreamServer;
+            if (saved === 'bingr' || saved === 'vidlink' || saved === 'multiembed') {
+                return saved;
+            }
+        }
+        return 'bingr';
+    });
+
+    const [antiHijackActive, setAntiHijackActive] = useState(true);
+    const isInternalNavRef = useRef(false);
+
+    const markInternalNavigation = () => {
+        isInternalNavRef.current = true;
+        setTimeout(() => {
+            isInternalNavRef.current = false;
+        }, 2000);
+    };
+
+    // Detect media parameters for dynamic multi-server URL switching
+    const extractedId = tmdbId || extractTmdbId(videoUrl);
+    const tvParams = extractBingrTvParams(videoUrl);
+    const detectedMediaType: 'movie' | 'tv' = mediaType || (tvControls || season || tvParams.isBingrTv ? 'tv' : 'movie');
+    const currentS = season || tvParams.season || 1;
+    const currentE = episode || tvParams.episode || 1;
+
+    // Build active URL based on current selected server
+    const activeUrl = extractedId
+        ? buildServerUrl(server, detectedMediaType, extractedId, currentS, currentE)
+        : videoUrl;
 
     // Parse the input URL/embed snippet
-    const embedInfo = parseEmbedUrl(videoUrl);
+    const embedInfo = parseEmbedUrl(activeUrl);
+
+    // Anti-Hijack Guard: Intercept rogue ad redirects attempting window.top.location hijacking
+    useEffect(() => {
+        if (!antiHijackActive) return;
+
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (isInternalNavRef.current) return;
+            e.preventDefault();
+            e.returnValue = 'AJStreams Anti-Hijack Guard blocked an external ad redirect.';
+            return e.returnValue;
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [antiHijackActive]);
+
+    // Anti-Hijack Guard: Protect against unauthorized top-level window.open ad popups
+    useEffect(() => {
+        if (!antiHijackActive || typeof window === 'undefined') return;
+
+        const originalWindowOpen = window.open;
+        window.open = function (...args: any[]) {
+            if (!isInternalNavRef.current) {
+                console.warn('[Anti-Hijack Guard] Blocked unprompted window.open attempt:', args[0]);
+                toast('🛡️ Anti-Hijack blocked an ad popup!', {
+                    icon: '🛡️',
+                    duration: 2500,
+                    style: {
+                        background: '#18181c',
+                        color: '#fff',
+                        border: '1px solid rgba(16, 185, 129, 0.4)',
+                    },
+                });
+                return null;
+            }
+            return originalWindowOpen.apply(this, args as any);
+        };
+
+        return () => {
+            window.open = originalWindowOpen;
+        };
+    }, [antiHijackActive]);
+
+    const handleSelectServer = (newServer: StreamServer) => {
+        markInternalNavigation();
+        setServer(newServer);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('ajstreams_stream_server', newServer);
+        }
+        onServerChange?.(newServer);
+        const serverObj = STREAM_SERVERS.find(s => s.id === newServer);
+        toast.success(`Switched to ${serverObj?.name || newServer} server`, {
+            icon: serverObj?.icon || '🌐',
+            duration: 2500,
+            style: {
+                background: '#18181c',
+                color: '#fff',
+                border: '1px solid rgba(168, 85, 247, 0.4)',
+            },
+        });
+    };
+
+    const handleBack = () => {
+        markInternalNavigation();
+        onClose?.();
+    };
+
+    const hideControlsTimeout = useRef<NodeJS.Timeout>();
 
     // Send postMessage command to Bingr / iframe player
     const sendIframeCommand = (command: string, payload: Record<string, any> = {}) => {
@@ -370,15 +485,48 @@ export default function VideoPlayer({
     }, []);
 
     return (
-        <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
-            {/* Close Button */}
-            <button
-                onClick={onClose}
-                className="absolute top-4 right-4 z-[60] w-12 h-12 rounded-full bg-black/80 hover:bg-black flex items-center justify-center text-white transition-colors border border-white/20 hover:scale-105"
-                aria-label="Close video player"
-            >
-                <X size={24} />
-            </button>
+        /* 100dvh so player fills full viewport on mobile without browser-bar overlap */
+        <div className="fixed inset-0 z-50 bg-black flex items-center justify-center" style={{ height: '100dvh' }}>
+            {/* Top Toolbar: Back, Server Selector, TV Controls, Title — all top-left, top-right free for Bingr */}
+            <div className="absolute top-2 md:top-4 left-2 md:left-4 z-[60] flex items-center gap-1.5 md:gap-2 flex-wrap max-w-[calc(100vw-80px)] md:max-w-[calc(100vw-130px)] pointer-events-auto">
+                {onClose && (
+                    <button
+                        onClick={handleBack}
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-black/80 hover:bg-black text-white text-xs font-semibold border border-white/20 hover:scale-105 transition-all shadow-lg backdrop-blur-md"
+                        aria-label="Back"
+                    >
+                        <ArrowLeft size={16} />
+                        <span>Back</span>
+                    </button>
+                )}
+
+                {/* Multi-Server Selector (Bingr, VidLink, MultiEmbed) */}
+                {extractedId && (
+                    <ServerSelector
+                        currentServer={server}
+                        onSelectServer={handleSelectServer}
+                        antiHijackActive={antiHijackActive}
+                        onToggleAntiHijack={() => {
+                            setAntiHijackActive(!antiHijackActive);
+                            toast(antiHijackActive ? 'Anti-Hijack Guard paused' : 'Anti-Hijack Guard activated', {
+                                icon: '🛡️',
+                            });
+                        }}
+                    />
+                )}
+
+                {/* TV Controls (Prev / Next Episode) */}
+                {tvControls && (
+                    <div className="flex items-center">
+                        {tvControls}
+                    </div>
+                )}
+
+                {/* Title Badge */}
+                <h2 className="text-white text-xs font-bold drop-shadow-md truncate max-w-[140px] lg:max-w-xs bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 hidden sm:block">
+                    {title}
+                </h2>
+            </div>
 
             {/* Video Container */}
             <div
@@ -390,6 +538,7 @@ export default function VideoPlayer({
                 {/* Embed / Iframe or Native Video Element */}
                 {embedInfo.isIframe ? (
                     <iframe
+                        key={embedInfo.embedUrl}
                         ref={iframeRef}
                         src={embedInfo.embedUrl}
                         title={title}
@@ -409,14 +558,6 @@ export default function VideoPlayer({
                         onCanPlay={() => setBuffering(false)}
                         onClick={handlePlayPause}
                     />
-                )}
-
-                {/* Bingr Badge Indicator */}
-                {embedInfo.isBingr && (
-                    <div className="absolute top-4 left-4 z-40 bg-purple-900/80 backdrop-blur-md px-3 py-1 rounded-full border border-purple-500/30 text-xs font-semibold text-purple-200 pointer-events-none flex items-center gap-1.5 shadow-lg">
-                        <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
-                        Bingr Player
-                    </div>
                 )}
 
                 {/* Buffering Indicator (native video only) */}
@@ -439,13 +580,6 @@ export default function VideoPlayer({
                         Host is controlling playback
                     </div>
                 )}
-
-                {/* Top Title Bar (Floating) */}
-                <div className="absolute top-0 left-0 right-0 p-4 pointer-events-none z-30 flex items-center justify-between">
-                    <h2 className="text-white text-lg md:text-xl font-bold drop-shadow-md ml-14 truncate max-w-md">
-                        {title}
-                    </h2>
-                </div>
 
                 {/* Native Video Controls Overlay (Only for native direct videos, not iframes) */}
                 {!embedInfo.isIframe && (
