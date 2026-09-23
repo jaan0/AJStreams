@@ -35,15 +35,18 @@
     overscroll-behavior: none;
   }
 
-  /* Make all interactive elements at least 44x44px on touch screens */
-  @media (pointer: coarse) {
-    button, a, [role="button"] {
-      min-height: 44px;
-      min-width: 44px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
+  /* iOS safe area utility classes */
+  .pt-safe {
+    padding-top: max(1rem, env(safe-area-inset-top, 1rem));
+  }
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem));
+  }
+  .pl-safe {
+    padding-left: max(1rem, env(safe-area-inset-left, 1rem));
+  }
+  .pr-safe {
+    padding-right: max(1rem, env(safe-area-inset-right, 1rem));
   }
 }
 

@@ -38,13 +38,19 @@ export default function Navbar() {
     return (
         <>
             <motion.nav
-                className={`fixed top-0 left-0 right-0 z-50 h-16 md:h-20 flex items-center transition-all duration-300 ${
+                className={`fixed top-0 left-0 right-0 z-50 flex items-center transition-all duration-300 ${
                     isScrolled
-                        ? 'bg-[#0a0a0a]/85 backdrop-blur-md border-b border-white/10 shadow-lg shadow-black/30'
-                        : 'bg-gradient-to-b from-black/80 via-black/30 to-transparent border-b border-transparent'
+                        ? 'bg-[#0a0a0a]/90 backdrop-blur-md border-b border-white/10 shadow-lg shadow-black/30'
+                        : 'bg-gradient-to-b from-black/90 via-black/40 to-transparent border-b border-transparent'
                 }`}
+                style={{
+                    paddingTop: 'env(safe-area-inset-top, 0px)',
+                    paddingLeft: 'max(0.75rem, env(safe-area-inset-left, 0px))',
+                    paddingRight: 'max(0.75rem, env(safe-area-inset-right, 0px))',
+                    minHeight: 'calc(4rem + env(safe-area-inset-top, 0px))',
+                }}
             >
-                <div className="w-full px-4 md:px-12 flex items-center justify-between">
+                <div className="w-full h-16 md:h-20 px-3 md:px-12 flex items-center justify-between">
                     {/* Left Section */}
                     <div className="flex items-center gap-4 md:gap-8">
                         {/* Mobile Menu Button */}
@@ -178,7 +184,11 @@ export default function Navbar() {
                             animate={{ x: 0 }}
                             exit={{ x: '-100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="fixed top-0 left-0 bottom-0 z-50 w-64 bg-zinc-900 border-r border-white/10 p-6 md:hidden"
+                            className="fixed top-0 left-0 bottom-0 z-50 w-64 bg-zinc-900 border-r border-white/10 p-6 md:hidden flex flex-col"
+                            style={{
+                                paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
+                                paddingLeft: 'max(1.5rem, env(safe-area-inset-left, 1.5rem))',
+                            }}
                         >
                             <div className="flex items-center justify-between mb-8">
                                 <img src="/logo.png" alt="Logo" className="h-8" />

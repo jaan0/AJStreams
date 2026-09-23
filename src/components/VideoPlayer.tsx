@@ -487,16 +487,23 @@ export default function VideoPlayer({
     return (
         /* 100dvh so player fills full viewport on mobile without browser-bar overlap */
         <div className="fixed inset-0 z-50 bg-black flex items-center justify-center" style={{ height: '100dvh' }}>
-            {/* Top Toolbar: Back, Server Selector, TV Controls, Title — all top-left, top-right free for Bingr */}
-            <div className="absolute top-2 md:top-4 left-2 md:left-4 z-[60] flex items-center gap-1.5 md:gap-2 flex-wrap max-w-[calc(100vw-80px)] md:max-w-[calc(100vw-130px)] pointer-events-auto">
+            {/* Top Toolbar: Back, Server Selector, TV Controls, Title — positioned safely below iPhone notch & landscape cutouts */}
+            <div
+                className="absolute z-[60] flex items-center gap-1.5 sm:gap-2 pointer-events-auto"
+                style={{
+                    top: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))',
+                    left: 'max(0.75rem, env(safe-area-inset-left, 0.75rem))',
+                    maxWidth: 'calc(100vw - max(1.5rem, env(safe-area-inset-left, 0.75rem) + env(safe-area-inset-right, 0.75rem)) - 72px)',
+                }}
+            >
                 {onClose && (
                     <button
                         onClick={handleBack}
-                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-black/80 hover:bg-black text-white text-xs font-semibold border border-white/20 hover:scale-105 transition-all shadow-lg backdrop-blur-md"
+                        className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-xl bg-black/85 hover:bg-black text-white text-xs font-semibold border border-white/20 active:scale-95 transition-all shadow-lg backdrop-blur-md shrink-0"
                         aria-label="Back"
                     >
                         <ArrowLeft size={16} />
-                        <span>Back</span>
+                        <span className="hidden sm:inline">Back</span>
                     </button>
                 )}
 
@@ -515,17 +522,19 @@ export default function VideoPlayer({
                     />
                 )}
 
-                {/* TV Controls (Prev / Next Episode) */}
+                {/* TV Controls (Prev / Next Episode) - hidden on mobile since mobile has dedicated bottom bar */}
                 {tvControls && (
-                    <div className="flex items-center">
+                    <div className="hidden md:flex items-center">
                         {tvControls}
                     </div>
                 )}
 
                 {/* Title Badge */}
-                <h2 className="text-white text-xs font-bold drop-shadow-md truncate max-w-[140px] lg:max-w-xs bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 hidden sm:block">
-                    {title}
-                </h2>
+                {title && (
+                    <h2 className="text-white text-xs font-bold drop-shadow-md truncate max-w-[120px] lg:max-w-xs bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 hidden md:block">
+                        {title}
+                    </h2>
+                )}
             </div>
 
             {/* Video Container */}
