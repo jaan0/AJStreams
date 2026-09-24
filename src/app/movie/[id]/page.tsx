@@ -165,8 +165,11 @@ export default function MoviePage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-black">
-                <div className="text-white text-lg">Loading...</div>
+            <div className="min-h-screen bg-black flex overflow-hidden">
+                <div className="relative flex-1 flex flex-col p-4 md:p-8">
+                    <div className="w-full h-12 mb-4 animate-pulse bg-zinc-900 rounded-lg max-w-sm" />
+                    <div className="flex-1 w-full animate-pulse bg-zinc-900 rounded-2xl" />
+                </div>
             </div>
         );
     }

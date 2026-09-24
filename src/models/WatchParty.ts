@@ -33,11 +33,6 @@ const WatchPartySchema: Schema<IWatchParty> = new Schema(
     { timestamps: true }
 );
 
-// Clear the model cache to ensure schema updates are picked up
-if (mongoose.models.WatchParty) {
-    delete mongoose.models.WatchParty;
-}
-
-const WatchParty: Model<IWatchParty> = mongoose.model<IWatchParty>('WatchParty', WatchPartySchema);
+const WatchParty: Model<IWatchParty> = mongoose.models.WatchParty || mongoose.model<IWatchParty>('WatchParty', WatchPartySchema);
 
 export default WatchParty;

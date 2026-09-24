@@ -40,9 +40,11 @@ export default function MovieWatchPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white">
-                <Loader className="animate-spin text-slate-500 mb-4" size={40} />
-                <p className="text-sm font-medium text-zinc-400">Loading movie stream...</p>
+            <div className="min-h-screen bg-black flex overflow-hidden">
+                <div className="relative flex-1 flex flex-col p-4 md:p-8">
+                    <div className="w-full h-12 mb-4 animate-pulse bg-zinc-900 rounded-lg max-w-sm" />
+                    <div className="flex-1 w-full animate-pulse bg-zinc-900 rounded-2xl" />
+                </div>
             </div>
         );
     }

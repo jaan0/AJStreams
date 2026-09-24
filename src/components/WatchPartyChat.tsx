@@ -217,7 +217,7 @@ export default function WatchPartyChat({
 
         try {
             // Send via API to broadcast to all participants
-            await fetch('/api/pusher/chat-toggle', {
+            const res = await fetch('/api/pusher/chat-toggle', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -225,6 +225,11 @@ export default function WatchPartyChat({
                     isDisabled: newDisabledState,
                 }),
             });
+            
+            if (!res.ok) {
+                throw new Error('Failed to toggle chat');
+            }
+            
             toast.success(newDisabledState ? 'Chat disabled' : 'Chat enabled');
         } catch (error) {
             toast.error('Failed to toggle chat');

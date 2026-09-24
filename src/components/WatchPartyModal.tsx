@@ -118,7 +118,8 @@ export default function WatchPartyModal({
                 setIsPrivate(false);
                 toast.success('Watch party created!');
             } else {
-                toast.error(data.error || data.details || 'Failed to create watch party');
+                const errorMsg = data.details?.message || data.error || 'Failed to create watch party';
+                toast.error(errorMsg);
             }
         } catch (error) {
             console.error('Network error:', error);
