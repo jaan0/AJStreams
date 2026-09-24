@@ -51,6 +51,8 @@ export default function VideoPlayer({
     const [showControls, setShowControls] = useState(true);
     const [isSyncing, setIsSyncing] = useState(false);
     const [buffering, setBuffering] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
+    const [playbackError, setPlaybackError] = useState(false);
 
     // Multi-server & Anti-Hijack state
     const [server, setServer] = useState<StreamServer>(() => {
@@ -132,6 +134,7 @@ export default function VideoPlayer({
     }, [antiHijackActive]);
 
     const handleSelectServer = (newServer: StreamServer) => {
+        setPlaybackError(false);
         markInternalNavigation();
         setServer(newServer);
         if (typeof window !== 'undefined') {
@@ -465,9 +468,7 @@ export default function VideoPlayer({
             if (screen.orientation && (screen.orientation as any).lock) {
                 try {
                     await (screen.orientation as any).lock('landscape');
-                } catch (e) {
-                    console.log('Orientation lock not supported or failed', e);
-                }
+                } catch { /* Optional enhancement; unsupported devices keep their orientation. */ }
             }
         };
 
@@ -477,9 +478,7 @@ export default function VideoPlayer({
             if (screen.orientation && (screen.orientation as any).unlock) {
                 try {
                     (screen.orientation as any).unlock();
-                } catch (e) {
-                    console.log('Orientation unlock failed', e);
-                }
+                } catch { /* No orientation lock was acquired. */ }
             }
         };
     }, []);
@@ -523,6 +522,7 @@ export default function VideoPlayer({
                 )}
 
                 {/* TV Controls (Prev / Next Episode) - hidden on mobile since mobile has dedicated bottom bar */}
+                <button className="px-3 py-2 rounded-xl bg-black/85 text-white text-xs border border-white/20 shrink-0" title="Reload the player. If playback still fails, choose another server." onClick={() => { markInternalNavigation(); setPlaybackError(false); setBuffering(false); setReloadKey(key => key + 1); }}>Retry</button>
                 {tvControls && (
                     <div className="hidden md:flex items-center">
                         {tvControls}
@@ -547,17 +547,17 @@ export default function VideoPlayer({
                 {/* Embed / Iframe or Native Video Element */}
                 {embedInfo.isIframe ? (
                     <iframe
-                        key={embedInfo.embedUrl}
+                        key={`${embedInfo.embedUrl}-${reloadKey}`}
                         ref={iframeRef}
                         src={embedInfo.embedUrl}
                         title={title}
                         className="w-full h-full border-0"
                         allow="autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope"
-                        allowFullScreen
                         referrerPolicy="origin"
                     />
                 ) : (
                     <video
+                        key={`${embedInfo.embedUrl}-${reloadKey}`}
                         ref={videoRef}
                         src={embedInfo.embedUrl}
                         className="w-full h-full object-contain"
@@ -565,11 +565,14 @@ export default function VideoPlayer({
                         onLoadedMetadata={() => setDuration(videoRef.current?.duration ?? 0)}
                         onWaiting={() => setBuffering(true)}
                         onCanPlay={() => setBuffering(false)}
+                        onError={() => { setBuffering(false); setPlaybackError(true); }}
+                        playsInline
                         onClick={handlePlayPause}
                     />
                 )}
 
                 {/* Buffering Indicator (native video only) */}
+                {playbackError && <div role="alert" className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/90 px-8 text-center"><h2 className="text-lg font-semibold">This video source could not play.</h2><p className="text-zinc-400 text-sm">Retry the player{extractedId ? ' or choose another server above' : '. The source may be unavailable or its link may have expired'}.</p></div>}
                 {buffering && !embedInfo.isIframe && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
                         <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin" />

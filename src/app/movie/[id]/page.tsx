@@ -40,6 +40,7 @@ export default function MoviePage() {
 
     const [movie, setMovie] = useState<Movie | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [loadError, setLoadError] = useState('');
     const [channel, setChannel] = useState<Channel | null>(null);
     const [isHost, setIsHost] = useState(false);
     const [isChatOpen, setIsChatOpen] = useState(true);
@@ -122,18 +123,22 @@ export default function MoviePage() {
     const fetchMovie = async () => {
         try {
             setIsLoading(true);
+            setLoadError('');
             const res = await fetch(`/api/movies/${movieId}`);
 
             if (res.ok) {
                 const data = await res.json();
                 setMovie(data);
             } else {
-                console.error('Movie not found');
-                router.push('/');
+                if (res.status === 404 && /^\d{1,12}$/.test(movieId) && !partyId) {
+                    router.replace(`/watch/movie/${movieId}`);
+                    return;
+                }
+                setLoadError(res.status === 404 ? 'This title is not in the library.' : 'The movie details could not load. Please try again.');
             }
         } catch (error) {
             console.error('Failed to fetch movie:', error);
-            router.push('/');
+            setLoadError('Could not connect to the movie library. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -175,7 +180,7 @@ export default function MoviePage() {
     }
 
     if (!movie) {
-        return null;
+        return <div className="min-h-screen flex flex-col items-center justify-center gap-5 px-6 text-center"><h1 className="text-xl font-semibold">{loadError || 'Opening player…'}</h1>{loadError && <button className="btn-secondary" onClick={fetchMovie}>Try again</button>}<button className="text-zinc-400" onClick={() => router.push('/movies')}>Back to library</button></div>;
     }
 
     // Active video URL: if TV show, calculate from current season & episode
