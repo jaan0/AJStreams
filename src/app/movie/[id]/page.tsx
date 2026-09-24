@@ -84,7 +84,7 @@ export default function MoviePage() {
             }
 
             const pusher = new Pusher(pusherKey, {
-                cluster: pusherCluster || 'mt1',
+                cluster: pusherCluster || 'ap1',
                 authEndpoint: '/api/pusher/auth',
             });
 
