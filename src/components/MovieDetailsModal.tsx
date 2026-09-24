@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import WatchPartyModal from './WatchPartyModal';
 import { extractBingrTvParams } from '@/lib/embed';
+import AvailabilityBadge from './AvailabilityBadge';
 
 interface MovieDetailsModalProps {
     movie: IMovie | null;
@@ -215,6 +216,7 @@ export default function MovieDetailsModal({ movie, onClose }: MovieDetailsModalP
                                                 <h2 className="text-3xl md:text-5xl font-black text-white leading-tight tracking-tight">
                                                     {movie.title}
                                                 </h2>
+                                                <AvailabilityBadge movie={movie} />
                                                 <div className="flex items-center gap-3 text-sm text-zinc-300">
                                                     {movie.rating > 0 && <span className="font-semibold text-zinc-200">★ {movie.rating.toFixed(1)}</span>}
                                                     <span>{movie.year}</span>

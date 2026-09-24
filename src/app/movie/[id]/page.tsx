@@ -204,6 +204,7 @@ export default function MoviePage() {
                 <div className="flex-1 relative">
                     <ErrorBoundary fallback={<VideoErrorFallback />}>
                         <VideoPlayer
+                            catalogId={movie._id}
                             videoUrl={activeVideoUrl}
                             title={displayTitle}
                             mediaType={isTvShow ? 'tv' : 'movie'}

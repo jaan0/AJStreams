@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import dbConnect from '@/lib/mongodb';
 import Movie from '@/models/Movie';
 import { authOptions } from '@/lib/auth';
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
     try {

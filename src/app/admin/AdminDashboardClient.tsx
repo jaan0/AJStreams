@@ -7,9 +7,10 @@ import { cn } from '@/lib/utils';
 import MoviesTab from '../../components/admin/MoviesTab';
 import RequestsTab from '../../components/admin/RequestsTab';
 import AnalyticsTab from '@/components/admin/AnalyticsTab';
+import AvailabilityTab from '@/components/admin/AvailabilityTab';
 
 export default function AdminDashboardClient() {
-    const [activeTab, setActiveTab] = useState<'movies' | 'requests' | 'analytics'>('movies');
+    const [activeTab, setActiveTab] = useState<'movies' | 'requests' | 'analytics' | 'availability'>('movies');
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -17,6 +18,7 @@ export default function AdminDashboardClient() {
 
             {/* Tabs */}
             <div className="flex gap-1 sm:gap-4 overflow-x-auto border-b border-white/10 mb-8">
+                <button onClick={() => setActiveTab('availability')} className={`px-4 py-3 text-sm font-medium border-b-2 ${activeTab === 'availability' ? 'border-slate-400 text-white' : 'border-transparent text-zinc-400'}`}>Availability</button>
                 <button onClick={() => setActiveTab('analytics')} className={`px-4 py-3 text-sm font-medium border-b-2 ${activeTab === 'analytics' ? 'border-slate-400 text-white' : 'border-transparent text-zinc-400'}`}>Analytics</button>
                 <button
                     onClick={() => setActiveTab('movies')}
@@ -58,7 +60,7 @@ export default function AdminDashboardClient() {
 
             {/* Content */}
             <div>
-                {activeTab === 'movies' ? <MoviesTab /> : activeTab === 'requests' ? <RequestsTab /> : <AnalyticsTab />}
+                {activeTab === 'movies' ? <MoviesTab /> : activeTab === 'requests' ? <RequestsTab /> : activeTab === 'availability' ? <AvailabilityTab /> : <AnalyticsTab />}
             </div>
         </div>
     );

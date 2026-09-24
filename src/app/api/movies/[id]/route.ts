@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Movie from '@/models/Movie';
 import { movieLookup } from '@/lib/movie-lookup';
+export const dynamic = 'force-dynamic';
 
 export async function GET(
     request: NextRequest,

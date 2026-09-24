@@ -6,9 +6,11 @@ import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, SkipBack, SkipForwar
 import { toast } from 'react-hot-toast';
 import { parseEmbedUrl, extractTmdbId, extractBingrTvParams, buildServerUrl, StreamServer, STREAM_SERVERS } from '@/lib/embed';
 import ServerSelector from '@/components/ServerSelector';
+import usePlaybackHealth from './usePlaybackHealth';
 
 interface VideoPlayerProps {
     videoUrl: string;
+    catalogId?: string;
     title: string;
     onClose?: () => void;
     channel?: Channel | null;
@@ -25,6 +27,7 @@ interface VideoPlayerProps {
 
 export default function VideoPlayer({
     videoUrl,
+    catalogId,
     title,
     onClose,
     channel,
@@ -90,6 +93,7 @@ export default function VideoPlayer({
 
     // Parse the input URL/embed snippet
     const embedInfo = parseEmbedUrl(activeUrl);
+    const health = usePlaybackHealth({ id: catalogId || extractedId, url: embedInfo.embedUrl, provider: embedInfo.isIframe ? server : 'direct', mediaType: detectedMediaType, season: currentS, episode: currentE, frame: iframeRef });
 
     // Anti-Hijack Guard: Intercept rogue ad redirects attempting window.top.location hijacking
     useEffect(() => {
@@ -176,6 +180,8 @@ export default function VideoPlayer({
     // Listen to Bingr embed postMessage events
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
+            if (event.source !== iframeRef.current?.contentWindow) return;
+            try { if (event.origin !== new URL(embedInfo.embedUrl).origin) return; } catch { return; }
             if (event.data?.type === 'PLAYER_EVENT' && event.data?.data?.event === 'playerstatus') {
                 const { currentTime: cTime, duration: dur, playing } = event.data.data;
                 if (typeof cTime === 'number' && !isSyncing) setCurrentTime(cTime);
@@ -186,7 +192,7 @@ export default function VideoPlayer({
 
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
-    }, [isSyncing]);
+    }, [isSyncing, embedInfo.embedUrl]);
 
     // Periodically poll iframe status for Bingr player
     useEffect(() => {
@@ -547,9 +553,9 @@ export default function VideoPlayer({
                 {/* Embed / Iframe or Native Video Element */}
                 {embedInfo.isIframe ? (
                     <iframe
-                        key={`${embedInfo.embedUrl}-${reloadKey}`}
+                        key={`${health.playerUrl}-${reloadKey}`}
                         ref={iframeRef}
-                        src={embedInfo.embedUrl}
+                        src={health.playerUrl}
                         title={title}
                         className="w-full h-full border-0"
                         allow="autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope"
@@ -561,11 +567,11 @@ export default function VideoPlayer({
                         ref={videoRef}
                         src={embedInfo.embedUrl}
                         className="w-full h-full object-contain"
-                        onTimeUpdate={() => !isSyncing && setCurrentTime(videoRef.current?.currentTime ?? 0)}
+                        onTimeUpdate={() => { if (!isSyncing) setCurrentTime(videoRef.current?.currentTime ?? 0); if (videoRef.current && !videoRef.current.paused && videoRef.current.currentTime >= 5) health.report('success'); }}
                         onLoadedMetadata={() => setDuration(videoRef.current?.duration ?? 0)}
                         onWaiting={() => setBuffering(true)}
                         onCanPlay={() => setBuffering(false)}
-                        onError={() => { setBuffering(false); setPlaybackError(true); }}
+                        onError={() => { setBuffering(false); setPlaybackError(true); if (navigator.onLine && [3, 4].includes(videoRef.current?.error?.code || 0)) health.report('failure'); }}
                         playsInline
                         onClick={handlePlayPause}
                     />

@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
+import type { Availability } from '@/lib/availability';
 
 export interface IMovie extends Document {
     title: string;
@@ -10,6 +11,7 @@ export interface IMovie extends Document {
     year: number;
     featured: boolean;
     views: number;
+    availability?: Availability;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -25,6 +27,7 @@ const MovieSchema: Schema<IMovie> = new Schema(
         year: { type: Number, required: true },
         featured: { type: Boolean, default: false },
         views: { type: Number, default: 0 },
+        availability: { status: { type: String, enum: ['unknown', 'available', 'issues', 'unavailable'] }, sourceUrl: String, checkedAt: Date, expiresAt: Date, reason: String },
     },
     { timestamps: true }
 );
