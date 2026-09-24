@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { Suspense, useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import MovieCard from '@/components/MovieCard';
 import MovieDetailsModal from '@/components/MovieDetailsModal';
 import Footer from '@/components/Footer';
@@ -8,6 +9,12 @@ import type { IMovie } from '@/models/Movie';
 import { Film } from 'react-feather';
 
 export default function MoviesPage() {
+    return <Suspense fallback={<div className="library-page" role="status">Loading collection…</div>}><MovieCollection /></Suspense>;
+}
+
+function MovieCollection() {
+    const searchParams = useSearchParams();
+    const selectedGenre = searchParams.get('genre') || 'All genres';
     const [movies, setMovies] = useState<IMovie[]>([]);
     const [selected, setSelected] = useState<IMovie | null>(null);
     const [loading, setLoading] = useState(true);
@@ -20,6 +27,7 @@ export default function MoviesPage() {
         try { const res = await fetch('/api/movies'); if (!res.ok) throw new Error(); const data = await res.json(); if (!Array.isArray(data)) throw new Error(); setMovies(data); } catch { setError(true); } finally { setLoading(false); }
     };
     useEffect(() => { load(); }, []);
+    useEffect(() => { setGenre(selectedGenre); }, [selectedGenre]);
     const genres = useMemo(() => Array.from(new Set(movies.flatMap(movie => movie.genre))).sort(), [movies]);
     const results = useMemo(() => {
         const filtered = movies.filter(movie => movie.title.toLowerCase().includes(query.toLowerCase()) && (genre === 'All genres' || movie.genre.includes(genre)));

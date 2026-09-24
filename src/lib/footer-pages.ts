@@ -77,6 +77,7 @@ export const footerPages: Record<string, InfoPage> = {
         sections: [
             { title: 'Account information', text: 'Account features use registration information such as your name and email, along with authentication credentials. Saved favorites are associated with your account.' },
             { title: 'Connected services', text: 'The app integrates external services for features such as movie metadata, media, and watch-party communication. External players and linked websites may process information under their own policies.' },
+            { title: 'Optional analytics', text: 'With your permission, we collect page visits, referrer domains, approximate country/region/city when provided by our host, device and browser categories, visible time, scroll depth and click coordinates. Events expire after 90 days. We do not store raw IP addresses, form contents or screen recordings. Admin pages are excluded.', href: '/cookies', link: 'Manage analytics preference' },
             { title: 'Browser storage', text: 'The app uses browser storage for preferences such as your selected streaming server and whether you dismissed the install banner.', href: '/cookies', link: 'Read storage notes' },
             { title: 'Questions about your information', text: 'The operator has not yet published a dedicated privacy request process or retention schedule. See the contact page for the available contact route.', href: '/contact', link: 'Contact information' },
         ],
@@ -96,7 +97,7 @@ export const footerPages: Record<string, InfoPage> = {
         notice: 'Draft storage overview. The operator must verify production cookies and third-party storage before finalizing this policy.',
         sections: [
             { title: 'Sign-in cookies', text: 'The app uses NextAuth for authentication. Authentication cookies support session and sign-in security; their exact names and behavior depend on the deployment configuration.' },
-            { title: 'Local preferences', text: 'The local storage key ajstreams_stream_server remembers the selected streaming server. The key ajstreams_pwa_dismissed remembers dismissal of the install prompt.' },
+            { title: 'Local preferences', text: 'The local storage key ajstreams_stream_server remembers the selected streaming server. The key ajstreams_pwa_dismissed remembers dismissal of the install prompt. ajstreams_analytics_consent stores your analytics choice; ajstreams_analytics_session in session storage groups consenting visits in this tab, renewing after 30 minutes of inactivity.' },
             { title: 'Managing browser storage', text: 'You can remove this site’s cookies and local storage in your browser settings. Doing so may sign you out and reset saved device preferences.' },
             { title: 'Embedded services', text: 'External video players may use their own cookies or storage. Consult the provider’s policy for details.', href: '/privacy', link: 'Privacy overview' },
         ],

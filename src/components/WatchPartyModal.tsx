@@ -212,9 +212,9 @@ export default function WatchPartyModal({
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            className="fixed inset-0 z-[101] flex items-center justify-center p-4"
+                            className="pwa-dialog-shell fixed inset-0 z-[101] flex items-center justify-center p-4"
                         >
-                            <div className="modal-bg shadow-2xl w-full max-w-md p-8">
+                            <div className="pwa-dialog-panel overflow-y-auto modal-bg shadow-2xl w-full max-w-md p-8">
                                 <div className="text-center mb-6">
                                     <div className="w-16 h-16 rounded-full bg-gradient-brand flex items-center justify-center mx-auto mb-4">
                                         <Check size={32} className="text-white" />
@@ -297,9 +297,9 @@ export default function WatchPartyModal({
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="fixed inset-0 z-[101] flex items-center justify-center p-4"
+                            className="pwa-dialog-shell fixed inset-0 z-[101] flex items-center justify-center p-4"
                         >
-                            <div className="modal-bg shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden">
+                            <div className="modal-bg shadow-2xl w-full max-w-2xl max-h-[85dvh] overflow-hidden">
                                 {/* Header */}
                                 <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
                                     <div className="flex items-center gap-3">
@@ -320,7 +320,7 @@ export default function WatchPartyModal({
                                 </div>
 
                                 {/* Content */}
-                                <div className="p-6 space-y-6 max-h-[calc(85vh-100px)] overflow-y-auto">
+                                <div className="p-6 space-y-6 max-h-[calc(85dvh-100px)] overflow-y-auto">
                                     {!showCreateForm ? (
                                         <>
                                             <button
@@ -463,9 +463,9 @@ export default function WatchPartyModal({
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="fixed inset-0 z-[102] flex items-center justify-center p-4"
+                            className="pwa-dialog-shell fixed inset-0 z-[102] flex items-center justify-center p-4"
                         >
-                            <div className="modal-bg p-6 w-full max-w-md">
+                            <div className="pwa-dialog-panel overflow-y-auto modal-bg p-6 w-full max-w-md">
                                 <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                     <Lock size={20} className="text-yellow-500" />
                                     Private Party

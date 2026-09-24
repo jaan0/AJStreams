@@ -93,7 +93,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                         initial={{ opacity: 0, y: -20, scale: 0.98 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -20, scale: 0.98 }}
-                        className="fixed top-12 left-0 right-0 z-[110] p-4 flex justify-center"
+                        className="pwa-search-shell fixed top-12 left-0 right-0 z-[110] p-4 flex justify-center"
                     >
                         <div role="dialog" aria-modal="true" aria-label="Search library" className="w-full max-w-3xl max-h-[85dvh] bg-[#121216] border border-white/10 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col ring-1 ring-slate-500/20">
                             {/* Search Input Box */}

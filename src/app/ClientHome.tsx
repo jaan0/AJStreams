@@ -7,6 +7,7 @@ import MovieSection from '@/components/MovieSection';
 import AIRecommendations from '@/components/AIRecommendations';
 import MovieDetailsModal from '@/components/MovieDetailsModal';
 import Footer from '@/components/Footer';
+import GenreCards, { getGenreCards } from '@/components/GenreCards';
 import type { IMovie } from '@/models/Movie';
 import { extractBingrTvParams } from '@/lib/embed';
 
@@ -28,6 +29,7 @@ export default function ClientHome({ featuredMovies, moviesByGenre, allMovies }:
             <div className="catalog-tabs scrollbar-hide" role="group" aria-label="Filter by genre">{categories.map(genre => <button key={genre} className={category === genre ? 'active' : ''} onClick={() => setCategory(genre)} aria-pressed={category === genre}>{genre}</button>)}</div>
             {category === 'All' ? <>
                 <MovieSection title="Recently added" movies={allMovies.slice(0, 18)} onPlay={setSelectedMovie} />
+                <GenreCards genres={getGenreCards(allMovies)} />
                 <AIRecommendations onPlay={setSelectedMovie} />
                 {moviesByGenre.map(section => <MovieSection key={section.genre} title={section.genre} movies={section.movies} onPlay={setSelectedMovie} />)}
             </> : <MovieSection title={`${category} picks`} movies={allMovies.filter(movie => movie.genre.includes(category))} onPlay={setSelectedMovie} />}

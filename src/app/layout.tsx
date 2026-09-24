@@ -8,6 +8,8 @@ import BottomNav from '@/components/BottomNav';
 import { Toaster } from 'react-hot-toast';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
 import PWARegister from '@/components/PWARegister';
+import AnalyticsTracker from '@/components/AnalyticsTracker';
+import BackToTop from '@/components/BackToTop';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -86,6 +88,8 @@ export default function RootLayout({
                     <BottomNav />
                     <PWAInstallBanner />
                     <PWARegister />
+                    <AnalyticsTracker />
+                    <BackToTop />
                     <Toaster
                         position="top-center"
                         toastOptions={{

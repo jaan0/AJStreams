@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, Film } from 'react-feather';
 import Footer from '@/components/Footer';
 import { footerPages } from '@/lib/footer-pages';
 import AccountPanel from '@/components/AccountPanel';
+import AnalyticsPreference from '@/components/AnalyticsPreference';
 
 export default function InfoPage({ slug }: { slug: string }) {
     const page = footerPages[slug];
@@ -26,6 +27,7 @@ export default function InfoPage({ slug }: { slug: string }) {
 
                 <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_260px]">
                     <div className="min-w-0">
+                        {slug === 'cookies' && <AnalyticsPreference />}
                         {page.notice && <p className="mb-6 rounded-card border border-slate-400/20 bg-brand-accent/10 p-5 text-sm leading-7 text-slate-200">{page.notice}</p>}
                         {slug === 'account' ? <AccountPanel /> : (
                             <div className={page.category === 'Legal' || slug === 'faq' ? 'space-y-4' : 'grid gap-5 sm:grid-cols-2'}>
