@@ -12,6 +12,7 @@ import WatchPartyChat from '@/components/WatchPartyChat';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import VideoErrorFallback from '@/components/VideoErrorFallback';
 import ChatErrorFallback from '@/components/ChatErrorFallback';
+import WatchPartyModal from '@/components/WatchPartyModal';
 import { extractBingrTvParams, buildBingrTvUrl, extractTmdbId } from '@/lib/embed';
 
 interface Movie {
@@ -52,6 +53,7 @@ export default function MoviePage() {
     const [currentSeason, setCurrentSeason] = useState<number>(1);
     const [currentEpisode, setCurrentEpisode] = useState<number>(1);
     const [isEpisodeSidebarOpen, setIsEpisodeSidebarOpen] = useState(false);
+    const [showWatchPartyModal, setShowWatchPartyModal] = useState(false);
 
     useEffect(() => {
         if (movieId) {
@@ -130,9 +132,30 @@ export default function MoviePage() {
                 const data = await res.json();
                 setMovie(data);
             } else {
-                if (res.status === 404 && /^\d{1,12}$/.test(movieId) && !partyId) {
-                    router.replace(`/watch/movie/${movieId}`);
-                    return;
+                if (res.status === 404 && /^\d{1,12}$/.test(movieId)) {
+                    if (!partyId) {
+                        router.replace(`/watch/movie/${movieId}`);
+                        return;
+                    }
+                    // Fetch TMDB metadata so TMDB titles work in Watch Parties
+                    try {
+                        const tmdbRes = await fetch(`/api/tmdb/movie/${movieId}`);
+                        if (tmdbRes.ok) {
+                            const tmdbData = await tmdbRes.json();
+                            setMovie({
+                                _id: movieId,
+                                title: tmdbData.title || 'Movie',
+                                description: tmdbData.overview || '',
+                                videoUrl: `https://bingr.stream/movie/${movieId}`,
+                                posterUrl: tmdbData.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` : undefined,
+                                genre: tmdbData.genres?.map((g: any) => g.name) || [],
+                                year: tmdbData.release_date ? new Date(tmdbData.release_date).getFullYear() : 2024,
+                            });
+                            return;
+                        }
+                    } catch (err) {
+                        console.error('TMDB fallback error in watch party:', err);
+                    }
                 }
                 setLoadError(res.status === 404 ? 'This title is not in the library.' : 'The movie details could not load. Please try again.');
             }
@@ -212,6 +235,7 @@ export default function MoviePage() {
                             season={isTvShow ? currentSeason : undefined}
                             episode={isTvShow ? currentEpisode : undefined}
                             onClose={handleClose}
+                            onWatchParty={!partyId ? () => setShowWatchPartyModal(true) : undefined}
                             channel={channel}
                             partyId={partyId || undefined}
                             isHost={isHost}
@@ -292,6 +316,17 @@ export default function MoviePage() {
                     />
                 </div>
             )}
+            {/* Watch Party Launch Modal */}
+            <WatchPartyModal
+                isOpen={showWatchPartyModal}
+                onClose={() => setShowWatchPartyModal(false)}
+                movieId={movie._id}
+                movieTitle={movie.title}
+                onJoinParty={(newPartyId) => {
+                    setShowWatchPartyModal(false);
+                    router.push(`/movie/${movie._id}?party=${newPartyId}`);
+                }}
+            />
         </div>
     );
 }

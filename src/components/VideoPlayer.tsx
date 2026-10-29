@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Channel } from 'pusher-js';
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, SkipBack, SkipForward, X, ArrowLeft } from 'react-feather';
+import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, SkipBack, SkipForward, X, ArrowLeft, Users, Share2 } from 'react-feather';
 import { toast } from 'react-hot-toast';
 import { parseEmbedUrl, extractTmdbId, extractBingrTvParams, buildServerUrl, StreamServer, STREAM_SERVERS } from '@/lib/embed';
 import ServerSelector from '@/components/ServerSelector';
@@ -23,6 +23,7 @@ interface VideoPlayerProps {
     episode?: number;
     defaultServer?: StreamServer;
     onServerChange?: (server: StreamServer) => void;
+    onWatchParty?: () => void;
 }
 
 export default function VideoPlayer({
@@ -40,6 +41,7 @@ export default function VideoPlayer({
     episode,
     defaultServer,
     onServerChange,
+    onWatchParty,
 }: VideoPlayerProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -534,6 +536,23 @@ export default function VideoPlayer({
                         {tvControls}
                     </div>
                 )}
+
+                {/* Watch Party status or launch button */}
+                {partyId ? (
+                    <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-900/40 border border-purple-500/40 text-purple-200 text-xs font-bold shrink-0 shadow-md">
+                        <Users size={14} className="text-purple-300" />
+                        <span>Watch Party Live</span>
+                    </div>
+                ) : onWatchParty ? (
+                    <button
+                        onClick={onWatchParty}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-black/85 hover:bg-brand-accent text-white text-xs font-semibold border border-white/20 transition-all shrink-0"
+                        title="Watch with friends"
+                    >
+                        <Users size={14} />
+                        <span className="hidden sm:inline">Watch Party</span>
+                    </button>
+                ) : null}
 
                 {/* Title Badge */}
                 {title && (

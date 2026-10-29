@@ -45,6 +45,13 @@ export async function POST(req: Request) {
         return validation.error;
     }
 
+    if (!pusherServer) {
+        return NextResponse.json(
+            { error: 'Pusher is not configured. Please add Pusher credentials in .env.local' },
+            { status: 503 }
+        );
+    }
+
     const { partyId, isDisabled } = validation.data;
     const channelName = `private-watch-party-${partyId}`;
 

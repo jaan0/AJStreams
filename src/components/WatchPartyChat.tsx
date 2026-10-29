@@ -6,6 +6,7 @@ import { MessageCircle, Send, ChevronRight, Share2, Copy, Check, Slash, Lock, X,
 import { Channel } from 'pusher-js';
 import { toast } from 'react-hot-toast';
 import ParticipantList from './ParticipantList';
+import { getWatchPartyPreferences, playMessageChime } from '@/lib/watch-party-settings';
 
 interface Message {
     id: string;
@@ -61,6 +62,9 @@ export default function WatchPartyChat({
         if (!session || !channel) return;
 
         const handleChatMessage = (message: Omit<Message, 'id' | 'sender' | 'senderId' | 'timestamp'> & { user: { name: string } }) => {
+            if (getWatchPartyPreferences().soundNotifications) {
+                playMessageChime();
+            }
             setMessages((prev) => [...prev, {
                 ...message,
                 id: `${Date.now()}-${Math.random()}`,
@@ -277,6 +281,25 @@ export default function WatchPartyChat({
         setTimeout(() => setCopied(false), 2000);
     };
 
+    const handleNativeShare = async () => {
+        if (!shareCode) return;
+        const link = `${window.location.origin}/watch-party/${shareCode}`;
+        if (typeof navigator !== 'undefined' && navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Join my Watch Party on AJStreams!',
+                    text: `Come watch with me on AJStreams! Room Code: ${shareCode}`,
+                    url: link,
+                });
+                return;
+            } catch (err: any) {
+                if (err.name !== 'AbortError') handleCopyLink();
+                return;
+            }
+        }
+        handleCopyLink();
+    };
+
     if (isMinimized) {
         return (
             <button
@@ -319,8 +342,16 @@ export default function WatchPartyChat({
                                             className="bg-transparent text-xs text-zinc-400 flex-1 outline-none w-full"
                                         />
                                         <button
+                                            onClick={handleNativeShare}
+                                            className="text-xs bg-brand-accent hover:bg-brand-accent/80 text-white px-2.5 py-1 rounded-md transition-colors font-medium flex items-center gap-1"
+                                            title="Share link"
+                                        >
+                                            <Share2 size={12} /> Share
+                                        </button>
+                                        <button
                                             onClick={handleCopyLink}
                                             className="text-zinc-400 hover:text-white transition-colors"
+                                            title="Copy link"
                                         >
                                             {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
                                         </button>

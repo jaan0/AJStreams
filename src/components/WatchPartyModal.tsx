@@ -193,6 +193,24 @@ export default function WatchPartyModal({
         setTimeout(() => setCopiedCode(null), 2000);
     };
 
+    const shareParty = async (shareCode: string, title?: string) => {
+        const link = `${window.location.origin}/watch-party/${shareCode}`;
+        if (typeof navigator !== 'undefined' && navigator.share) {
+            try {
+                await navigator.share({
+                    title: `Watch ${title || movieTitle} together on AJStreams!`,
+                    text: `Join my watch party for "${title || movieTitle}" on AJStreams! Room Code: ${shareCode}`,
+                    url: link,
+                });
+                return;
+            } catch (err: any) {
+                if (err.name !== 'AbortError') copyShareLink(shareCode);
+                return;
+            }
+        }
+        copyShareLink(shareCode);
+    };
+
     if (!isOpen) return null;
 
     return createPortal(
@@ -258,8 +276,17 @@ export default function WatchPartyModal({
                                                 className="flex-1 bg-black/30 border border-white/10 rounded-lg py-2 px-3 text-white text-sm"
                                             />
                                             <button
+                                                onClick={() => shareParty(createdParty.shareCode, createdParty.movieTitle)}
+                                                className="px-4 py-2 bg-brand-accent hover:bg-brand-accent/80 text-white rounded-lg transition-colors flex items-center gap-1.5 text-xs font-semibold"
+                                                title="Share with friends"
+                                            >
+                                                <Share2 size={16} />
+                                                <span>Share</span>
+                                            </button>
+                                            <button
                                                 onClick={() => copyShareLink(createdParty.shareCode)}
                                                 className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                                                title="Copy link"
                                             >
                                                 {copiedCode === createdParty.shareCode ? (
                                                     <Check size={18} className="text-green-500" />

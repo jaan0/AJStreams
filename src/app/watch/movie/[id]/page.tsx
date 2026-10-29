@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import VideoPlayer from '@/components/VideoPlayer';
 import { ArrowLeft, Loader } from 'react-feather';
 import { createBingrMovieUrl } from '@/lib/embed';
@@ -9,7 +9,15 @@ import { createBingrMovieUrl } from '@/lib/embed';
 export default function MovieWatchPage() {
     const params = useParams();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const tmdbId = params.id as string;
+    const partyId = searchParams.get('party');
+
+    useEffect(() => {
+        if (partyId && tmdbId) {
+            router.replace(`/movie/${tmdbId}?party=${partyId}`);
+        }
+    }, [partyId, tmdbId, router]);
 
     const [movieTitle, setMovieTitle] = useState('Movie');
     const [isLoading, setIsLoading] = useState(true);
@@ -59,6 +67,7 @@ export default function MovieWatchPage() {
                         mediaType="movie"
                         tmdbId={tmdbId}
                         onClose={handleClose}
+                        onWatchParty={() => router.push(`/movie/${tmdbId}`)}
                     />
                 </div>
             </div>

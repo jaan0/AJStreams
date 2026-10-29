@@ -225,19 +225,24 @@ export async function PUT(req: NextRequest) {
 
         switch (action) {
             case 'join':
-                if (!party.participants.includes(userId)) {
+                const alreadyJoined = party.participants.some(
+                    (p: any) => (p._id || p).toString() === userId.toString()
+                );
+                if (!alreadyJoined) {
                     party.participants.push(userId);
 
                     // Trigger update event for participants list
-                    try {
-                        await pusherServer.trigger(`private-watch-party-${party._id}`, 'party-update', {
-                            type: 'join',
-                            userId,
-                            participants: party.participants
-                        });
-                    } catch (pusherError) {
-                        console.error('Pusher trigger failed:', pusherError);
-                        // Continue execution even if Pusher fails
+                    if (pusherServer) {
+                        try {
+                            await pusherServer.trigger(`private-watch-party-${party._id}`, 'party-update', {
+                                type: 'join',
+                                userId,
+                                participants: party.participants
+                            });
+                        } catch (pusherError) {
+                            console.error('Pusher trigger failed:', pusherError);
+                            // Continue execution even if Pusher fails
+                        }
                     }
                 }
                 break;
