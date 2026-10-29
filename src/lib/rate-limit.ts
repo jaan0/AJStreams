@@ -51,12 +51,12 @@ function createRateLimiter(config: RateLimiterConfig) {
 
 // Rate limit configurations
 export const rateLimiters = {
-    message:     createRateLimiter({ maxRequests: 10, windowMs: 60_000 }),
-    videoSync:   createRateLimiter({ maxRequests: 30, windowMs: 60_000 }),
-    chatToggle:  createRateLimiter({ maxRequests: 5,  windowMs: 60_000 }),
-    partyEnd:    createRateLimiter({ maxRequests: 3,  windowMs: 60_000 }),
-    createParty: createRateLimiter({ maxRequests: 5,  windowMs: 300_000 }),
-    updateParty: createRateLimiter({ maxRequests: 20, windowMs: 60_000 }),
+    message:     createRateLimiter({ maxRequests: 60, windowMs: 60_000 }),
+    videoSync:   createRateLimiter({ maxRequests: 60, windowMs: 60_000 }),
+    chatToggle:  createRateLimiter({ maxRequests: 10, windowMs: 60_000 }),
+    partyEnd:    createRateLimiter({ maxRequests: 5,  windowMs: 60_000 }),
+    createParty: createRateLimiter({ maxRequests: 10, windowMs: 300_000 }),
+    updateParty: createRateLimiter({ maxRequests: 60, windowMs: 60_000 }),
 };
 
 type Limiter = ReturnType<typeof createRateLimiter>;

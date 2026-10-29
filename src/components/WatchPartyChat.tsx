@@ -17,8 +17,8 @@ interface Message {
     isSystem?: boolean;
     user?: {
         name: string;
-        image: string;
-    }
+        image?: string;
+    };
 }
 
 interface Participant {
@@ -42,7 +42,7 @@ export default function WatchPartyChat({
     isHost = false,
     onToggleMinimize,
     isMinimized = false,
-    shareCode
+    shareCode,
 }: WatchPartyChatProps) {
     const { data: session } = useSession();
     const [messages, setMessages] = useState<Message[]>([]);
@@ -58,43 +58,110 @@ export default function WatchPartyChat({
     const [hostId, setHostId] = useState<string>('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
+    const isCurrentUser = (msg: Message) => {
+        if (!session?.user) return false;
+        const myId = (session.user as any).id;
+        const myEmail = session.user.email;
+        const myName = session.user.name;
+        const myNick = getWatchPartyPreferences().nickname;
+        return (
+            (myId && msg.senderId === myId) ||
+            (myEmail && (msg.senderId === myEmail || msg.senderId === myId)) ||
+            (myName && (msg.senderId === myName || msg.sender === myName)) ||
+            (myNick && msg.sender === myNick)
+        );
+    };
+
+    const fetchChatHistory = async () => {
+        if (!partyId) return;
+        try {
+            const res = await fetch(`/api/pusher/message?partyId=${partyId}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (Array.isArray(data.messages) && data.messages.length > 0) {
+                    setMessages((prev) => {
+                        const existingIds = new Set(prev.map((m) => m.id));
+                        const fresh = data.messages.filter((m: Message) => !existingIds.has(m.id));
+                        if (fresh.length === 0) return prev;
+                        return [...prev, ...fresh];
+                    });
+                }
+            }
+        } catch (err) {
+            console.error('Failed to fetch chat history:', err);
+        }
+    };
+
+    useEffect(() => {
+        fetchPartyDetails();
+        fetchChatHistory();
+
+        // 3-second polling fallback so chat works even if Pusher isn't connected
+        const interval = setInterval(fetchChatHistory, 3000);
+        return () => clearInterval(interval);
+    }, [partyId]);
+
     useEffect(() => {
         if (!session || !channel) return;
 
-        const handleChatMessage = (message: Omit<Message, 'id' | 'sender' | 'senderId' | 'timestamp'> & { user: { name: string } }) => {
-            if (getWatchPartyPreferences().soundNotifications) {
-                playMessageChime();
-            }
-            setMessages((prev) => [...prev, {
-                ...message,
-                id: `${Date.now()}-${Math.random()}`,
-                sender: message.user.name,
-                senderId: message.user.name,
-                timestamp: Date.now(),
-            }]);
+        const handleChatMessage = (payload: any) => {
+            const incomingId = payload.id || `${Date.now()}-${Math.random()}`;
+            setMessages((prev) => {
+                // Deduplicate if already added optimistically or by ID
+                const alreadyExists = prev.some(
+                    (m) =>
+                        m.id === incomingId ||
+                        (m.text === payload.text &&
+                            m.sender === (payload.user?.name || payload.sender) &&
+                            Math.abs(m.timestamp - (payload.timestamp || Date.now())) < 4000)
+                );
+                if (alreadyExists) return prev;
+
+                if (getWatchPartyPreferences().soundNotifications) {
+                    playMessageChime();
+                }
+
+                return [
+                    ...prev,
+                    {
+                        id: incomingId,
+                        sender: payload.user?.name || payload.sender || 'Friend',
+                        senderId: payload.user?.id || payload.senderId || payload.user?.name || 'user',
+                        text: payload.text,
+                        timestamp: payload.timestamp || Date.now(),
+                        user: payload.user,
+                    },
+                ];
+            });
         };
 
         const handleToggleChat = ({ isDisabled }: { isDisabled: boolean }) => {
             setIsDisabled(isDisabled);
-            setMessages((prev) => [...prev, {
-                id: Date.now().toString(),
-                sender: 'System',
-                senderId: 'system',
-                text: isDisabled ? 'Chat has been disabled by the host.' : 'Chat has been enabled.',
-                timestamp: Date.now(),
-                isSystem: true
-            }]);
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: Date.now().toString(),
+                    sender: 'System',
+                    senderId: 'system',
+                    text: isDisabled ? 'Chat has been disabled by the host.' : 'Chat has been enabled.',
+                    timestamp: Date.now(),
+                    isSystem: true,
+                },
+            ]);
         };
 
         const handlePartyEnded = () => {
-            setMessages((prev) => [...prev, {
-                id: Date.now().toString(),
-                sender: 'System',
-                senderId: 'system',
-                text: 'The host has ended this watch party. Redirecting...',
-                timestamp: Date.now(),
-                isSystem: true
-            }]);
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: Date.now().toString(),
+                    sender: 'System',
+                    senderId: 'system',
+                    text: 'The host has ended this watch party. Redirecting...',
+                    timestamp: Date.now(),
+                    isSystem: true,
+                },
+            ]);
 
             toast('The host has ended this watch party', {
                 icon: '👋',
@@ -107,7 +174,6 @@ export default function WatchPartyChat({
         };
 
         const handlePartyUpdate = async () => {
-            // Refresh participant list
             fetchPartyDetails();
         };
 
@@ -115,9 +181,6 @@ export default function WatchPartyChat({
         channel.bind('chat-toggle', handleToggleChat);
         channel.bind('party-ended', handlePartyEnded);
         channel.bind('party-update', handlePartyUpdate);
-
-        // Initial fetch
-        fetchPartyDetails();
 
         return () => {
             channel.unbind('chat-message', handleChatMessage);
@@ -132,29 +195,12 @@ export default function WatchPartyChat({
             const res = await fetch(`/api/watch-party?id=${partyId}`);
             if (res.ok) {
                 const data = await res.json();
-                // We need to fetch full participant details if the API only returns IDs
-                // But for now let's assume the API returns populated participants or we need to fetch them
-                // The current API returns populated 'host', but 'participants' is just an array of IDs in the schema
-                // We might need to update the GET endpoint to populate participants or fetch them separately.
-                // Let's check if we can get populated participants.
-                // Actually, the GET endpoint in route.ts does NOT populate participants.
-                // We should update the GET endpoint to populate participants.
-
-                // For now, let's assume we will update the API to populate participants.
-                // If not, we might need a separate endpoint.
-                // Let's update the API GET endpoint in the next step if needed.
-
-                // Wait, I can't update the API in this tool call. 
-                // I will assume the API returns populated participants for now, 
-                // and if it doesn't, I will fix it in the next step.
-
                 if (data.participants && typeof data.participants[0] === 'object') {
                     setParticipants(data.participants);
-                } else {
-                    // Fallback or handle IDs
-                    // For now, let's just set the host
                 }
-                setHostId(data.host._id);
+                if (data.host?._id) {
+                    setHostId(data.host._id);
+                }
             }
         } catch (error) {
             console.error('Failed to fetch party details', error);
@@ -171,13 +217,32 @@ export default function WatchPartyChat({
 
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newMessage.trim() || isDisabled || !session?.user || isSending) return;
+        const text = newMessage.trim();
+        if (!text || isDisabled || !session?.user || isSending) return;
 
-        const messageData = {
-            text: newMessage,
+        const currentPrefs = getWatchPartyPreferences();
+        const senderName =
+            currentPrefs.nickname.trim() ||
+            session.user.name ||
+            session.user.email?.split('@')[0] ||
+            'You';
+        const senderId =
+            (session.user as any).id || session.user.email || session.user.name || 'me';
+
+        const tempId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+        const optimisticMsg: Message = {
+            id: tempId,
+            sender: senderName,
+            senderId,
+            text,
+            timestamp: Date.now(),
         };
 
+        // Optimistically add message right away so chat is instantaneous
+        setMessages((prev) => [...prev, optimisticMsg]);
+        setNewMessage('');
         setIsSending(true);
+
         try {
             const response = await fetch('/api/pusher/message', {
                 method: 'POST',
@@ -186,17 +251,28 @@ export default function WatchPartyChat({
                 },
                 body: JSON.stringify({
                     channel: `private-watch-party-${partyId}`,
-                    message: messageData,
+                    message: { text },
                 }),
             });
 
+            const data = await response.json().catch(() => ({}));
+
             if (response.ok) {
-                setNewMessage('');
+                if (data.message?.id) {
+                    setMessages((prev) =>
+                        prev.map((m) => (m.id === tempId ? { ...m, id: data.message.id } : m))
+                    );
+                }
             } else {
-                toast.error('Failed to send message');
+                // Rollback optimistic message on failure
+                setMessages((prev) => prev.filter((m) => m.id !== tempId));
+                setNewMessage(text);
+                toast.error(data.error || 'Failed to send message');
             }
-        } catch (error) {
-            toast.error('Failed to send message');
+        } catch (error: any) {
+            setMessages((prev) => prev.filter((m) => m.id !== tempId));
+            setNewMessage(text);
+            toast.error(error.message || 'Failed to send message');
         } finally {
             setIsSending(false);
         }
@@ -206,21 +282,23 @@ export default function WatchPartyChat({
         if (!isHost) return;
         const newDisabledState = !isDisabled;
 
-        // Optimistic update
         setIsDisabled(newDisabledState);
 
-        // Add system message locally
-        setMessages((prev) => [...prev, {
-            id: Date.now().toString(),
-            sender: 'System',
-            senderId: 'system',
-            text: newDisabledState ? 'Chat has been disabled by the host.' : 'Chat has been enabled.',
-            timestamp: Date.now(),
-            isSystem: true
-        }]);
+        setMessages((prev) => [
+            ...prev,
+            {
+                id: Date.now().toString(),
+                sender: 'System',
+                senderId: 'system',
+                text: newDisabledState
+                    ? 'Chat has been disabled by the host.'
+                    : 'Chat has been enabled.',
+                timestamp: Date.now(),
+                isSystem: true,
+            },
+        ]);
 
         try {
-            // Send via API to broadcast to all participants
             const res = await fetch('/api/pusher/chat-toggle', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -229,15 +307,14 @@ export default function WatchPartyChat({
                     isDisabled: newDisabledState,
                 }),
             });
-            
+
             if (!res.ok) {
                 throw new Error('Failed to toggle chat');
             }
-            
+
             toast.success(newDisabledState ? 'Chat disabled' : 'Chat enabled');
         } catch (error) {
             toast.error('Failed to toggle chat');
-            // Revert on error
             setIsDisabled(!newDisabledState);
         }
     };
@@ -247,14 +324,12 @@ export default function WatchPartyChat({
 
         setIsEndingParty(true);
         try {
-            // Broadcast party end event
             await fetch('/api/pusher/party-end', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ partyId }),
             });
 
-            // Update party status in database
             await fetch('/api/watch-party', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -264,7 +339,6 @@ export default function WatchPartyChat({
                 }),
             });
 
-            // Redirect host to home
             window.location.href = '/';
         } catch (error) {
             toast.error('Failed to end party');
@@ -318,36 +392,31 @@ export default function WatchPartyChat({
             <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/5">
                 <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    <h3 className="font-bold text-white">Live Chat</h3>
+                    <h3 className="font-bold text-white text-sm">Live Chat</h3>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                     {isHost && shareCode && (
                         <div className="relative">
                             <button
                                 onClick={() => setShowShareModal(!showShareModal)}
-                                className={`p-2 rounded-lg transition-colors ${showShareModal ? 'bg-brand-accent text-white' : 'hover:bg-white/10 text-zinc-400'}`}
+                                className={`p-2 rounded-lg transition-colors ${
+                                    showShareModal ? 'bg-brand-accent text-white' : 'hover:bg-white/10 text-zinc-400'
+                                }`}
                                 title="Share Party"
                             >
-                                <Share2 size={18} />
+                                <Share2 size={16} />
                             </button>
 
                             {/* Share Modal/Popover */}
                             {showShareModal && (
-                                <div className="absolute right-0 top-full mt-2 w-64 bg-zinc-900 border border-white/10 rounded-xl shadow-xl p-4 z-50">
-                                    <h4 className="text-white text-sm font-bold mb-2">Share Party Link</h4>
+                                <div className="absolute right-0 top-full mt-2 w-64 bg-zinc-900 border border-white/10 rounded-xl shadow-xl p-4 z-50 space-y-3">
+                                    <h4 className="text-white text-xs font-bold uppercase tracking-wider">Share Party Link</h4>
                                     <div className="flex items-center gap-2 bg-black/50 rounded-lg p-2 border border-white/5">
                                         <input
                                             readOnly
                                             value={`${typeof window !== 'undefined' ? window.location.origin : ''}/watch-party/${shareCode}`}
                                             className="bg-transparent text-xs text-zinc-400 flex-1 outline-none w-full"
                                         />
-                                        <button
-                                            onClick={handleNativeShare}
-                                            className="text-xs bg-brand-accent hover:bg-brand-accent/80 text-white px-2.5 py-1 rounded-md transition-colors font-medium flex items-center gap-1"
-                                            title="Share link"
-                                        >
-                                            <Share2 size={12} /> Share
-                                        </button>
                                         <button
                                             onClick={handleCopyLink}
                                             className="text-zinc-400 hover:text-white transition-colors"
@@ -356,6 +425,12 @@ export default function WatchPartyChat({
                                             {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
                                         </button>
                                     </div>
+                                    <button
+                                        onClick={handleNativeShare}
+                                        className="w-full btn-primary py-2 text-xs flex items-center justify-center gap-1.5 rounded-lg"
+                                    >
+                                        <Share2 size={12} /> Share with Friends
+                                    </button>
                                 </div>
                             )}
                         </div>
@@ -365,9 +440,9 @@ export default function WatchPartyChat({
                         <button
                             onClick={toggleChatDisable}
                             className="p-2 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-white transition-colors"
-                            title={isDisabled ? "Enable Chat" : "Disable Chat"}
+                            title={isDisabled ? 'Enable Chat' : 'Disable Chat'}
                         >
-                            <Slash size={18} />
+                            <Slash size={16} />
                         </button>
                     )}
 
@@ -377,15 +452,16 @@ export default function WatchPartyChat({
                             className="p-2 hover:bg-red-500/20 rounded-lg text-red-400 hover:text-red-300 transition-colors"
                             title="End Party"
                         >
-                            <X size={18} />
+                            <X size={16} />
                         </button>
                     )}
 
                     <button
                         onClick={onToggleMinimize}
                         className="p-2 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-white transition-colors"
+                        title="Close chat panel"
                     >
-                        <ChevronRight size={20} />
+                        <ChevronRight size={18} />
                     </button>
                 </div>
             </div>
@@ -394,8 +470,9 @@ export default function WatchPartyChat({
             <div className="flex border-b border-white/10">
                 <button
                     onClick={() => setActiveTab('chat')}
-                    className={`flex-1 py-3 text-sm font-bold transition-colors relative ${activeTab === 'chat' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'
-                        }`}
+                    className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors relative ${
+                        activeTab === 'chat' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'
+                    }`}
                 >
                     Chat
                     {activeTab === 'chat' && (
@@ -404,118 +481,126 @@ export default function WatchPartyChat({
                 </button>
                 <button
                     onClick={() => setActiveTab('participants')}
-                    className={`flex-1 py-3 text-sm font-bold transition-colors relative ${activeTab === 'participants' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'
-                        }`}
+                    className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors relative ${
+                        activeTab === 'participants' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'
+                    }`}
                 >
-                    Participants ({participants.length})
+                    Viewers ({participants.length || 1})
                     {activeTab === 'participants' && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-accent" />
                     )}
                 </button>
             </div>
 
-            {
-                activeTab === 'chat' ? (
-                    <>
-                        {/* Messages */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
-                            {messages.map((msg) => (
+            {activeTab === 'chat' ? (
+                <>
+                    {/* Messages List */}
+                    <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                        {messages.length === 0 && (
+                            <div className="text-center py-12 text-zinc-500 text-xs space-y-1">
+                                <Users size={28} className="mx-auto opacity-30 mb-2" />
+                                <p className="font-semibold text-zinc-400">Welcome to the Watch Party!</p>
+                                <p>Say hello to your friends to start chatting.</p>
+                            </div>
+                        )}
+
+                        {messages.map((msg) => {
+                            const isMe = isCurrentUser(msg);
+                            return (
                                 <div
                                     key={msg.id}
-                                    className={`flex flex-col ${msg.isSystem ? 'items-center' : msg.senderId === session?.user?.name ? 'items-end' : 'items-start'}`}
+                                    className={`flex flex-col ${msg.isSystem ? 'items-center' : isMe ? 'items-end' : 'items-start'}`}
                                 >
                                     {!msg.isSystem && (
-                                        <div className='flex items-center gap-2'>
-                                            <span className="text-xs text-zinc-500 mb-1 px-1">
-                                                {msg.sender} • {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        <div className="flex items-center gap-1.5 mb-1 px-1">
+                                            <span className="text-[11px] font-semibold text-zinc-400">
+                                                {isMe ? 'You' : msg.sender}
+                                            </span>
+                                            <span className="text-[10px] text-zinc-500">
+                                                {new Date(msg.timestamp).toLocaleTimeString([], {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}
                                             </span>
                                         </div>
                                     )}
                                     <div
-                                        className={`max-w-[85%] px-4 py-2 rounded-2xl text-sm ${msg.isSystem
-                                            ? 'bg-white/10 text-zinc-400 text-xs py-1 px-3 rounded-full'
-                                            : msg.senderId === session?.user?.name
-                                                ? 'bg-brand-accent text-white rounded-tr-none'
-                                                : 'bg-white/10 text-zinc-200 rounded-tl-none'
-                                            }`}
+                                        className={`max-w-[85%] px-3.5 py-2 rounded-2xl text-xs leading-relaxed break-words ${
+                                            msg.isSystem
+                                                ? 'bg-white/10 text-zinc-400 text-[11px] py-1 px-3 rounded-full text-center'
+                                                : isMe
+                                                ? 'bg-brand-accent text-white rounded-tr-none shadow-md'
+                                                : 'bg-zinc-800 text-zinc-100 rounded-tl-none border border-white/5'
+                                        }`}
                                     >
                                         {msg.text}
                                     </div>
                                 </div>
-                            ))}
-                            <div ref={messagesEndRef} />
-                        </div>
+                            );
+                        })}
+                        <div ref={messagesEndRef} />
+                    </div>
 
-                        {/* Input */}
-                        <div className="p-4 border-t border-white/10 bg-black/50">
-                            <form onSubmit={handleSendMessage} className="flex gap-2">
-                                <input
-                                    type="text"
-                                    value={newMessage}
-                                    onChange={(e) => setNewMessage(e.target.value)}
-                                    placeholder={isDisabled ? "Chat disabled by host" : "Type a message..."}
-                                    disabled={isDisabled || !session || isSending}
-                                    className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-white text-sm focus:outline-none focus:border-brand-accent/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={!newMessage.trim() || isDisabled || !session || isSending}
-                                    className="w-10 h-10 rounded-full bg-brand-accent flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-accent/80 transition-colors relative"
-                                >
-                                    {isSending ? (
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    ) : (
-                                        <Send size={18} />
-                                    )}
-                                </button>
-                            </form>
-                        </div>
-                    </>
-                ) : (
-                    <ParticipantList
-                        participants={participants}
-                        hostId={hostId}
-                        currentUserId={session?.user?.id}
-                    />
-                )
-            }
+                    {/* Chat Input */}
+                    <div className="p-3 border-t border-white/10 bg-black/60">
+                        <form onSubmit={handleSendMessage} className="flex gap-2">
+                            <input
+                                type="text"
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                placeholder={isDisabled ? 'Chat disabled by host' : 'Type a message...'}
+                                disabled={isDisabled || !session || isSending}
+                                className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2.5 text-white text-xs focus:outline-none focus:border-brand-accent/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            />
+                            <button
+                                type="submit"
+                                disabled={!newMessage.trim() || isDisabled || !session || isSending}
+                                className="w-9 h-9 rounded-full bg-brand-accent flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-accent/80 transition-colors shrink-0 shadow-md"
+                            >
+                                {isSending ? (
+                                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                ) : (
+                                    <Send size={15} />
+                                )}
+                            </button>
+                        </form>
+                    </div>
+                </>
+            ) : (
+                <ParticipantList
+                    participants={participants}
+                    hostId={hostId}
+                    currentUserId={(session?.user as any)?.id}
+                />
+            )}
 
             {/* End Party Confirmation Modal */}
-            {
-                showEndPartyModal && (
-                    <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-                        <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
-                            <h3 className="text-xl font-bold text-white mb-2">End Watch Party?</h3>
-                            <p className="text-zinc-400 text-sm mb-6">
-                                All participants will be disconnected and redirected. This action cannot be undone.
-                            </p>
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={() => setShowEndPartyModal(false)}
-                                    disabled={isEndingParty}
-                                    className="flex-1 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors disabled:opacity-50"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleEndParty}
-                                    disabled={isEndingParty}
-                                    className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                                >
-                                    {isEndingParty ? (
-                                        <>
-                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                            Ending...
-                                        </>
-                                    ) : (
-                                        'End Party'
-                                    )}
-                                </button>
-                            </div>
+            {showEndPartyModal && (
+                <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+                        <h3 className="text-lg font-bold text-white mb-2">End Watch Party?</h3>
+                        <p className="text-zinc-400 text-xs mb-6">
+                            All participants will be disconnected and redirected. This cannot be undone.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setShowEndPartyModal(false)}
+                                disabled={isEndingParty}
+                                className="btn-ghost flex-1 py-2 text-xs"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleEndParty}
+                                disabled={isEndingParty}
+                                className="flex-1 py-2 px-3 bg-red-500 hover:bg-red-600 text-white rounded-xl text-xs font-bold transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+                            >
+                                {isEndingParty ? 'Ending...' : 'End Party'}
+                            </button>
                         </div>
                     </div>
-                )
-            }
-        </div >
+                </div>
+            )}
+        </div>
     );
 }
